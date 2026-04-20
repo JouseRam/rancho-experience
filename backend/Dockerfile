@@ -8,7 +8,6 @@ RUN dotnet publish RanchoApi/RanchoApi.csproj -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
-ENV ASPNETCORE_URLS=http://+:$PORT
 ENV ASPNETCORE_ENVIRONMENT=Production
-EXPOSE $PORT
-ENTRYPOINT ["dotnet", "RanchoApi.dll"]
+EXPOSE 8080
+CMD ASPNETCORE_URLS=http://+:${PORT:-8080} dotnet RanchoApi.dll
