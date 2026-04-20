@@ -1,0 +1,6 @@
+@RanchoApi_HostAddress = http://localhost:5190
+
+GET {{RanchoApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
