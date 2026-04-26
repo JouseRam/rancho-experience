@@ -1,0 +1,87 @@
+@model RanchoMvc.Models.Reservation
+@{
+    ViewBag.Title = "Detalle Cotización";
+    var statuses = ViewBag.Statuses as string[];
+}
+
+<div class="mb-4">
+    <a href="@Url.Action("Index")" class="text-muted small text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i>Volver a Cotizaciones
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="stat-card">
+            <div class="d-flex align-items-start justify-content-between mb-4">
+                <div>
+                    <h5 class="fw-semibold mb-1">@Model.CompanyName</h5>
+                    <span class="badge @(Model.Status=="Confirmada"?"badge-confirmed":Model.Status=="Cancelada"?"badge-cancelled":"badge-pending") fs-6">
+                        @Model.Status
+                    </span>
+                </div>
+                <div class="text-muted small">Recibido: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="text-muted small text-uppercase">Contacto</label>
+                    <p class="mb-0 fw-medium">@Model.ContactName</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="text-muted small text-uppercase">Correo</label>
+                    <p class="mb-0"><a href="mailto:@Model.Email">@Model.Email</a></p>
+                </div>
+                <div class="col-md-6">
+                    <label class="text-muted small text-uppercase">Teléfono</label>
+                    <p class="mb-0">@(string.IsNullOrEmpty(Model.Phone) ? "—" : Model.Phone)</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="text-muted small text-uppercase">Plan de interés</label>
+                    <p class="mb-0">@(Model.Plan != null ? Model.Plan.Title : "No especificado")</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="text-muted small text-uppercase">Fecha preferida</label>
+                    <p class="mb-0">@(Model.PreferredDate.HasValue ? Model.PreferredDate.Value.ToString("dd/MM/yyyy") : "—")</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="text-muted small text-uppercase">No. de personas</label>
+                    <p class="mb-0">@Model.GuestCount</p>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="col-12">
+                        <label class="text-muted small text-uppercase">Notas</label>
+                        <p class="mb-0">@Model.Notes</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h6 class="fw-semibold mb-3">Cambiar Estado</h6>
+            @using (Html.BeginForm("UpdateStatus","Reservations",new{area="Admin",id=Model.Id},FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <select name="status" class="form-select">
+                        @foreach (var s in statuses)
+                        {
+                            <option value="@s" @(Model.Status==s?"selected":"")>@s</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="btn w-100" style="background:#2D5016;color:white;">Actualizar Estado</button>
+            }
+        </div>
+        <div class="stat-card mt-3">
+            @using (Html.BeginForm("Delete","Reservations",new{area="Admin",id=Model.Id},FormMethod.Post, new{onsubmit="return confirm('¿Eliminar esta cotización?')"}))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-danger w-100">
+                    <i class="bi bi-trash me-2"></i>Eliminar
+                </button>
+            }
+        </div>
+    </div>
+</div>

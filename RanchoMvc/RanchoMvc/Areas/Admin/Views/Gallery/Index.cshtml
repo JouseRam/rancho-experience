@@ -1,0 +1,96 @@
+@model IEnumerable<RanchoMvc.Models.GalleryImage>
+@{
+    ViewBag.Title = "Galería";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h5 class="mb-0 fw-semibold">Galería de Imágenes</h5>
+        <p class="text-muted small mb-0">Sube imágenes a Cloudinary para mostrar en el sitio.</p>
+    </div>
+    <button class="btn btn-sm" style="background:#2D5016;color:white;" data-bs-toggle="modal" data-bs-target="#uploadModal">
+        <i class="bi bi-cloud-upload me-1"></i>Subir Imagen
+    </button>
+</div>
+
+<!-- Grid de imágenes -->
+<div class="row g-3">
+    @foreach (var img in Model)
+    {
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="gallery-admin-card">
+                <img src="@img.Url" alt="@img.AltText" class="gallery-admin-img" />
+                <div class="gallery-admin-overlay">
+                    <span class="badge bg-secondary">@img.Category</span>
+                    @using (Html.BeginForm("Delete","Gallery",new{area="Admin",id=img.Id},FormMethod.Post,new{onsubmit="return confirm('¿Eliminar imagen?')"}))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-danger rounded-circle">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    }
+                </div>
+                <div class="gallery-admin-caption">
+                    <span class="small text-muted">@img.AltText</span>
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="bi bi-images fs-1 d-block mb-2"></i>
+            No hay imágenes. Sube la primera.
+        </div>
+    }
+</div>
+
+<!-- Modal Upload -->
+<div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold">Subir Imagen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            @using (Html.BeginForm("Upload","Gallery",new{area="Admin"},FormMethod.Post,new{enctype="multipart/form-data"}))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Imagen <span class="text-danger">*</span></label>
+                        <input type="file" name="file" class="form-control" accept="image/*" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Categoría</label>
+                        <select name="category" class="form-select">
+                            <option value="general">General</option>
+                            <option value="cabalgata">Cabalgata</option>
+                            <option value="glamping">Glamping</option>
+                            <option value="campo">Día de Campo</option>
+                            <option value="instalaciones">Instalaciones</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Texto alternativo</label>
+                        <input type="text" name="altText" class="form-control" placeholder="Descripción de la imagen" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn" style="background:#2D5016;color:white;">Subir a Cloudinary</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<style>
+    .gallery-admin-card { position: relative; border-radius: 10px; overflow: hidden; background: #f1f1f1; }
+    .gallery-admin-img { width: 100%; height: 160px; object-fit: cover; display: block; }
+    .gallery-admin-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: space-between; padding: .5rem; opacity: 0; transition: .2s; }
+    .gallery-admin-card:hover .gallery-admin-overlay { opacity: 1; }
+    .gallery-admin-caption { padding: .4rem .5rem; font-size: .75rem; }
+</style>
+}

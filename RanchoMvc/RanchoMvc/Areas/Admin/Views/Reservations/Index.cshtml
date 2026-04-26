@@ -1,0 +1,69 @@
+@model IEnumerable<RanchoMvc.Models.Reservation>
+@{
+    ViewBag.Title = "Cotizaciones";
+    var statuses = ViewBag.Statuses as string[];
+    var current = ViewBag.CurrentStatus as string;
+}
+
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h5 class="mb-0 fw-semibold">Cotizaciones</h5>
+    <div class="btn-group btn-group-sm">
+        <a href="@Url.Action("Index")" class="btn @(current==null?"btn-secondary":"btn-outline-secondary")">Todas</a>
+        @foreach (var s in statuses)
+        {
+            <a href="@Url.Action("Index",new{status=s})" class="btn @(current==s?"btn-secondary":"btn-outline-secondary")">@s</a>
+        }
+    </div>
+</div>
+
+<div class="stat-card p-0">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Familia / Grupo</th>
+                    <th>Contacto</th>
+                    <th>Plan</th>
+                    <th>Personas</th>
+                    <th>Fecha pref.</th>
+                    <th>Estado</th>
+                    <th>Recibido</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr>
+                        <td class="fw-medium">@r.CompanyName</td>
+                        <td>
+                            <div class="small">@r.ContactName</div>
+                            <div class="text-muted" style="font-size:.75rem">@r.Email</div>
+                        </td>
+                        <td class="small">@(r.Plan != null ? r.Plan.Title : "—")</td>
+                        <td class="small text-center">@r.GuestCount</td>
+                        <td class="small">@(r.PreferredDate.HasValue ? r.PreferredDate.Value.ToString("dd/MM/yyyy") : "—")</td>
+                        <td>
+                            <span class="badge @(r.Status=="Confirmada"?"badge-confirmed":r.Status=="Cancelada"?"badge-cancelled":"badge-pending")">
+                                @r.Status
+                            </span>
+                        </td>
+                        <td class="text-muted small">@r.CreatedAt.ToString("dd/MM/yy")</td>
+                        <td>
+                            <a href="@Url.Action("Details",new{id=r.Id})" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+            No hay cotizaciones@(current != null ? " con estado \"" + current + "\"" : "") aún.
+        </div>
+    }
+</div>

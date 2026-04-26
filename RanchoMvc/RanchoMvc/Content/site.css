@@ -1,0 +1,358 @@
+/* ============================================================
+   Rancho El Pato – Custom CSS
+   Paleta: verde #2D5016, dorado #C4882A, café #5C3A1E
+   ============================================================ */
+
+:root {
+    --green:   #2D5016;
+    --green2:  #3d6a20;
+    --gold:    #C4882A;
+    --gold2:   #d49a3a;
+    --brown:   #5C3A1E;
+    --dark:    #111;
+    --cream:   #f7f4ee;
+}
+
+/* ---- Base ---- */
+body { font-family: 'Inter', sans-serif; color: #1a1a1a; }
+h1,h2,h3,h4,h5 { font-family: 'Playfair Display', Georgia, serif; }
+.py-section { padding: 5rem 0; }
+.bg-cream { background: var(--cream); }
+.bg-dark-ranch { background: var(--dark); }
+.text-gold { color: var(--gold) !important; }
+.text-gold-light { color: #e0a84d !important; }
+
+/* ---- Navbar ---- */
+.navbar-ranch {
+    background: transparent;
+    transition: background .35s, box-shadow .35s;
+    padding: 1.25rem 0;
+}
+.navbar-ranch.scrolled {
+    background: rgba(17,17,17,.97);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(0,0,0,.4);
+    padding: .75rem 0;
+}
+.navbar-ranch .nav-link { color: rgba(255,255,255,.85); font-weight: 500; font-size: .9rem; transition: color .2s; }
+.navbar-ranch .nav-link:hover { color: var(--gold); }
+.navbar-ranch .navbar-toggler { border-color: rgba(255,255,255,.4); color: white; }
+.brand-text { font-family: 'Playfair Display', serif; color: white; font-weight: 700; font-size: 1.2rem; }
+.brand-icon { font-size: 1.3rem; margin-right: .3rem; }
+.brand-logo { height: 36px; width: auto; object-fit: contain; margin-right: .4rem; }
+
+/* ---- Buttons ---- */
+.btn-gold { background: var(--gold); color: white; border: none; font-weight: 600; transition: background .2s, transform .15s; }
+.btn-gold:hover { background: var(--gold2); color: white; transform: translateY(-2px); }
+.btn-ranch { background: var(--green); color: white; border: none; font-weight: 600; transition: background .2s, transform .15s; }
+.btn-ranch:hover { background: var(--green2); color: white; transform: translateY(-2px); }
+.btn-ranch-sm { background: transparent; color: var(--green); border: 2px solid var(--green); font-size: .85rem; padding: .35rem .9rem; border-radius: 6px; font-weight: 600; text-decoration: none; transition: all .2s; }
+.btn-ranch-sm:hover { background: var(--green); color: white; }
+.btn-hero { padding: .8rem 2.2rem; font-size: 1rem; font-weight: 600; border-radius: 50px; }
+
+/* ---- Section Headers ---- */
+.section-tag {
+    background: rgba(196,136,42,.12);
+    color: var(--gold);
+    border: 1px solid rgba(196,136,42,.3);
+    padding: .3rem .85rem;
+    border-radius: 100px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+.section-title { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; line-height: 1.2; }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(0,0,0,.7) 0%, rgba(45,80,22,.45) 60%, rgba(0,0,0,.65) 100%);
+    z-index: 1;
+}
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 7rem 1rem 5rem;
+}
+.hero-tag {
+    display: inline-block;
+    background: rgba(196,136,42,.2);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: .35rem 1.1rem;
+    border-radius: 100px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+}
+.hero-title {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    text-shadow: 0 2px 20px rgba(0,0,0,.4);
+    margin-bottom: 1.25rem;
+}
+.hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    max-width: 580px;
+    margin: 0 auto;
+    opacity: .9;
+    text-shadow: 0 1px 8px rgba(0,0,0,.3);
+}
+.hero-scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    color: white;
+    font-size: 1.5rem;
+    opacity: .7;
+    animation: bounce 2s infinite;
+    text-decoration: none;
+}
+@keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ============================================================
+   EXPERIENCIAS
+   ============================================================ */
+.exp-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,.07);
+    transition: transform .3s, box-shadow .3s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-top: 4px solid transparent;
+}
+.exp-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px rgba(0,0,0,.12);
+    border-top-color: var(--gold);
+}
+.exp-icon-wrap {
+    width: 72px; height: 72px;
+    background: var(--cream);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.25rem;
+    color: var(--green);
+}
+.stat-icon {
+    font-size: 2rem;
+    color: var(--green);
+    width: 48px;
+    text-align: center;
+}
+.exp-title { font-size: 1.3rem; font-weight: 700; margin-bottom: .75rem; }
+.exp-desc { color: #555; font-size: .9rem; flex: 1; margin-bottom: 1rem; }
+.exp-includes { margin-bottom: 1.25rem; }
+.exp-includes li { font-size: .85rem; margin-bottom: .3rem; color: #444; }
+.exp-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; border-top: 1px solid #f0ebe0; }
+.exp-price { font-weight: 700; color: var(--green); font-size: .95rem; }
+
+/* ============================================================
+   GALERÍA MASONRY
+   ============================================================ */
+.gallery-masonry {
+    columns: 4 200px;
+    column-gap: 10px;
+}
+.gallery-masonry .gallery-item {
+    break-inside: avoid;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+.gallery-masonry .gallery-item img {
+    width: 100%;
+    display: block;
+    transition: transform .4s;
+}
+.gallery-masonry .gallery-item:hover img { transform: scale(1.05); }
+.gallery-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,.4);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .25s;
+}
+.gallery-item:hover .gallery-overlay { opacity: 1; }
+.gallery-placeholder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+    gap: 10px;
+}
+.gallery-ph-item {
+    aspect-ratio: 4/3;
+    background: rgba(255,255,255,.05);
+    border-radius: 10px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: .5rem;
+}
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+.about-img-wrap { position: relative; }
+.about-img { width: 100%; border-radius: 20px; box-shadow: 0 12px 40px rgba(0,0,0,.15); }
+.about-badge {
+    position: absolute;
+    bottom: -1.5rem; right: -1.5rem;
+    background: var(--gold);
+    color: white;
+    padding: .75rem 1.25rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: .9rem;
+    display: flex; align-items: center; gap: .5rem;
+    box-shadow: 0 4px 16px rgba(196,136,42,.4);
+}
+.about-badge-icon { font-size: 1.3rem; }
+.about-text p { color: #444; line-height: 1.8; margin-bottom: 1rem; }
+.features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+.feature-item {
+    display: flex; align-items: flex-start; gap: .75rem;
+    padding: 1rem;
+    background: var(--cream);
+    border-radius: 12px;
+}
+.feature-emoji { font-size: 1.75rem; flex-shrink: 0; color: var(--green); }
+.feature-item strong { font-size: .9rem; display: block; margin-bottom: .2rem; }
+.feature-item p { font-size: .8rem; color: #666; margin: 0; }
+
+/* ============================================================
+   CTA
+   ============================================================ */
+.cta-section {
+    position: relative;
+    padding: 6rem 0;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+.cta-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(45,80,22,.85) 0%, rgba(0,0,0,.75) 100%);
+}
+.cta-content { position: relative; z-index: 1; }
+.cta-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; text-shadow: 0 2px 16px rgba(0,0,0,.4); }
+.cta-subtitle { font-size: 1.1rem; opacity: .9; max-width: 500px; margin: 1rem auto 0; }
+.reservation-form-card {
+    background: rgba(255,255,255,.97);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+
+/* ============================================================
+   CONTACTO
+   ============================================================ */
+.contact-list { display: flex; flex-direction: column; gap: 1rem; }
+.contact-list-item {
+    display: flex; align-items: center; gap: .85rem;
+    color: #333; text-decoration: none; font-size: .95rem;
+    transition: color .2s;
+}
+.contact-list-item:hover { color: var(--green); }
+.contact-list-item i { color: var(--green); font-size: 1.2rem; width: 1.5rem; flex-shrink: 0; }
+.social-links { display: flex; gap: .75rem; }
+.social-btn {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: transform .2s, opacity .2s;
+    color: white;
+}
+.social-btn:hover { transform: scale(1.1); color: white; }
+.social-btn.whatsapp { background: #25d366; }
+.social-btn.instagram { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+.social-btn.facebook { background: #1877f2; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer-ranch { background: #111; }
+.footer-brand { color: white; font-family: 'Playfair Display', serif; font-size: 1.2rem; }
+.footer-heading { color: rgba(255,255,255,.6); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+.footer-link { color: rgba(255,255,255,.5); text-decoration: none; font-size: .875rem; display: block; margin-bottom: .3rem; transition: color .2s; }
+.footer-link:hover { color: var(--gold); }
+
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+.lightbox {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.95);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    cursor: zoom-out;
+}
+.lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
+.lightbox-close {
+    position: absolute; top: 1rem; right: 1.5rem;
+    background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;
+}
+
+/* ============================================================
+   FORM CARD
+   ============================================================ */
+.form-card { background: white; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+.form-control:focus, .form-select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 .2rem rgba(45,80,22,.2);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .hero-title { font-size: 2.2rem; }
+    .gallery-masonry { columns: 2; }
+    .features-grid { grid-template-columns: 1fr; }
+    .about-badge { bottom: -.5rem; right: .5rem; font-size: .8rem; }
+    .reservation-form-card { padding: 1.5rem; }
+}

@@ -1,0 +1,149 @@
+@model IEnumerable<RanchoMvc.Models.SiteSetting>
+@{
+    ViewBag.Title = "Ajustes del Sitio";
+    var groups = ViewBag.Groups as List<string>;
+    var uploadUrl = Url.Action("UploadFile", "Settings", new { area = "Admin" });
+}
+
+<div class="mb-4">
+    <h5 class="mb-1 fw-semibold">Ajustes del Sitio</h5>
+    <p class="text-muted small mb-0">Edita textos, imágenes y videos que aparecen en la página pública.</p>
+</div>
+
+<form method="post" action="@Url.Action("Save","Settings",new{area="Admin"})">
+    @Html.AntiForgeryToken()
+
+    <div class="d-flex justify-content-end mb-3">
+        <button type="submit" class="btn px-4" style="background:#2D5016;color:white;">
+            <i class="bi bi-floppy me-2"></i>Guardar Cambios
+        </button>
+    </div>
+
+    @foreach (var group in groups)
+    {
+        <div class="stat-card mb-4">
+            <h6 class="fw-semibold mb-3 pb-2 border-bottom">
+                @if (group == "Hero")       { <text><i class="fa-solid fa-film me-2"></i>Hero (Portada)</text> }
+                else if (group == "About")  { <text><i class="fa-solid fa-book me-2"></i>Nosotros / Historia</text> }
+                else if (group == "CTA")    { <text><i class="fa-solid fa-bullhorn me-2"></i>Sección CTA</text> }
+                else if (group == "Contacto") { <text><i class="fa-solid fa-phone me-2"></i>Información de Contacto</text> }
+                else if (group == "Redes")  { <text><i class="fa-solid fa-share-nodes me-2"></i>Redes Sociales</text> }
+                else { @group }
+            </h6>
+            <div class="row g-3">
+                @foreach (var s in Model.Where(x => x.Group == group))
+                {
+                    <div class="col-12 @(s.Type == "text" || s.Type == "url" ? "col-md-6" : "")">
+                        <label class="form-label fw-medium small">@s.Label</label>
+                        @if (s.Type == "textarea")
+                        {
+                            <textarea name="setting_@s.Id" class="form-control" rows="3">@s.Value</textarea>
+                        }
+                        else if (s.Type == "video-url" || s.Type == "image-url")
+                        {
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fa-solid @(s.Type == "video-url" ? "fa-film" : "fa-image")"></i>
+                                </span>
+                                <input type="url" id="url_@s.Id" name="setting_@s.Id" class="form-control"
+                                       value="@s.Value" placeholder="https://..." />
+                                <label class="btn btn-outline-secondary mb-0 upload-btn" title="Subir archivo"
+                                       data-target="url_@s.Id"
+                                       data-preview="preview_@s.Id"
+                                       data-type="@s.Type">
+                                    <i class="fa-solid fa-upload"></i>
+                                    <input type="file" class="d-none"
+                                           accept="@(s.Type == "video-url" ? "video/*" : "image/*")" />
+                                </label>
+                            </div>
+                            <div id="preview_@s.Id" class="mt-2">
+                                @if (!string.IsNullOrEmpty(s.Value))
+                                {
+                                    if (s.Type == "image-url")
+                                    {
+                                        <img src="@s.Value" alt="Preview" class="rounded"
+                                             style="max-height:100px;max-width:100%;object-fit:cover;" />
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted small mb-0">
+                                            <i class="fa-solid fa-film me-1"></i>
+                                            <a href="@s.Value" target="_blank">@s.Value</a>
+                                        </p>
+                                    }
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="text" name="setting_@s.Id" class="form-control"
+                                   value="@s.Value" />
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-lg px-5" style="background:#2D5016;color:white;">
+            <i class="bi bi-floppy me-2"></i>Guardar Todos los Cambios
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    var uploadUrl = '@uploadUrl';
+
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.upload-btn');
+        if (!btn) return;
+        btn.querySelector('input[type=file]').click();
+    });
+
+    document.addEventListener('change', function (e) {
+        var fileInput = e.target;
+        if (!fileInput || fileInput.type !== 'file') return;
+        var btn = fileInput.closest('.upload-btn');
+        if (!btn || !fileInput.files || !fileInput.files[0]) return;
+
+        var file      = fileInput.files[0];
+        var urlInput  = document.getElementById(btn.dataset.target);
+        var preview   = document.getElementById(btn.dataset.preview);
+        var type      = btn.dataset.type;
+        var icon      = btn.querySelector('i');
+
+        icon.className = 'spinner-border spinner-border-sm';
+        btn.classList.add('disabled');
+
+        var fd = new FormData();
+        fd.append('file', file);
+
+        fetch(uploadUrl, {
+            method: 'POST',
+            body: fd,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.success) {
+                urlInput.value = data.url;
+                if (type === 'image-url') {
+                    preview.innerHTML = '<img src="' + data.url + '" class="rounded" style="max-height:100px;max-width:100%;object-fit:cover;" />';
+                } else {
+                    preview.innerHTML = '<p class="text-muted small mb-0"><i class="fa-solid fa-film me-1"></i><a href="' + data.url + '" target="_blank">Video subido correctamente</a></p>';
+                }
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(function () { alert('Error de conexión.'); })
+        .finally(function () {
+            icon.className = 'fa-solid fa-upload';
+            btn.classList.remove('disabled');
+            fileInput.value = '';
+        });
+    });
+</script>
+}

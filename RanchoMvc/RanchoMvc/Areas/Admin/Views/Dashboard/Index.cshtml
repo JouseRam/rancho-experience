@@ -1,0 +1,130 @@
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon"><i class="fa-solid fa-list-check"></i></div>
+                <div>
+                    <div class="stat-value">@ViewBag.TotalPlans</div>
+                    <div class="stat-label">Planes Activos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                <div>
+                    <div class="stat-value">@ViewBag.PendingReservations</div>
+                    <div class="stat-label">Cotizaciones Pendientes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon"><i class="fa-solid fa-envelope"></i></div>
+                <div>
+                    <div class="stat-value">@ViewBag.UnreadMessages</div>
+                    <div class="stat-label">Mensajes Sin Leer</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon"><i class="fa-solid fa-images"></i></div>
+                <div>
+                    <div class="stat-value">@ViewBag.TotalGallery</div>
+                    <div class="stat-label">Imágenes Galería</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Cotizaciones recientes -->
+    <div class="col-md-7">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="mb-0 fw-semibold">Cotizaciones Recientes</h6>
+                <a href="@Url.Action("Index","Reservations",new{area="Admin"})" class="btn btn-sm btn-outline-secondary">Ver todas</a>
+            </div>
+            @{
+                var reservations = ViewBag.RecentReservations as IList<RanchoMvc.Models.Reservation>;
+            }
+            @if (reservations != null && reservations.Count > 0)
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Familia / Grupo</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in reservations)
+                            {
+                                <tr>
+                                    <td>@r.CompanyName</td>
+                                    <td class="text-muted small">@r.CreatedAt.ToString("dd/MM/yy")</td>
+                                    <td>
+                                        <span class="badge @(r.Status=="Confirmada"?"badge-confirmed":r.Status=="Cancelada"?"badge-cancelled":"badge-pending")">
+                                            @r.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted small">No hay cotizaciones aún.</p>
+            }
+        </div>
+    </div>
+
+    <!-- Mensajes recientes -->
+    <div class="col-md-5">
+        <div class="stat-card">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="mb-0 fw-semibold">Mensajes Recientes</h6>
+                <a href="@Url.Action("Index","Messages",new{area="Admin"})" class="btn btn-sm btn-outline-secondary">Ver todos</a>
+            </div>
+            @{
+                var messages = ViewBag.RecentMessages as IList<RanchoMvc.Models.ContactMessage>;
+            }
+            @if (messages != null && messages.Count > 0)
+            {
+                <ul class="list-unstyled">
+                    @foreach (var m in messages)
+                    {
+                        <li class="d-flex align-items-start gap-2 py-2 border-bottom">
+                            <i class="bi bi-person-circle fs-5 text-muted mt-1"></i>
+                            <div>
+                                <div class="fw-medium small">@m.Name @(!m.IsRead ? Html.Raw("<span class='badge bg-danger ms-1' style='font-size:.65rem'>Nuevo</span>") : null)</div>
+                                <div class="text-muted" style="font-size:.8rem">@m.Company</div>
+                                <div class="text-muted" style="font-size:.75rem">@m.CreatedAt.ToString("dd/MM/yy HH:mm")</div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-muted small">No hay mensajes aún.</p>
+            }
+        </div>
+    </div>
+</div>

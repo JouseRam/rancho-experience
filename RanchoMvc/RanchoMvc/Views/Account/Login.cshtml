@@ -1,0 +1,69 @@
+@model RanchoMvc.Models.ViewModels.LoginViewModel
+@{
+    ViewBag.Title = "Acceso Admin";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin – Rancho Experience</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #1a2a1a; min-height: 100vh; display: flex; align-items: center; }
+        .login-card { background: white; border-radius: 16px; padding: 2.5rem; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+        .login-logo { font-size: 2rem; margin-bottom: 0.5rem; }
+        .btn-ranch { background: #2D5016; color: white; border: none; }
+        .btn-ranch:hover { background: #3d6a20; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-auto">
+                <div class="login-card">
+                    <div class="text-center mb-4">
+                        <div class="login-logo">🌿</div>
+                        <h4 class="fw-bold">Rancho Experience</h4>
+                        <p class="text-muted small">Panel de Administración</p>
+                    </div>
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Correo electrónico</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "admin@rancho.com" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Contraseña</label>
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "••••••••" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="mb-4">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
+                                <label class="form-check-label small text-muted">Recordarme</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-ranch w-100 py-2 fw-medium">Ingresar</button>
+                    }
+
+                    <div class="text-center mt-3">
+                        <a href="@Url.Action("Index","Home")" class="text-muted small text-decoration-none">← Volver al sitio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

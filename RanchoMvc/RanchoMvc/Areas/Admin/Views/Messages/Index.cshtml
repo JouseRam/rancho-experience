@@ -1,0 +1,64 @@
+@model IEnumerable<RanchoMvc.Models.ContactMessage>
+@{
+    ViewBag.Title = "Mensajes";
+}
+
+<div class="mb-4">
+    <h5 class="mb-0 fw-semibold">Mensajes de Contacto</h5>
+</div>
+
+<div class="stat-card p-0">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Ocasión</th>
+                    <th>Correo</th>
+                    <th>Mensaje</th>
+                    <th>Fecha</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model)
+                {
+                    <tr @(!m.IsRead ? "class=table-warning" : "")>
+                        <td>
+                            <div class="fw-medium">
+                                @if (!m.IsRead)
+                                {
+                                    <span class="badge bg-danger me-1" style="font-size:.65rem">Nuevo</span>
+                                }
+                                @m.Name
+                            </div>
+                        </td>
+                        <td class="small text-muted">@m.Company</td>
+                        <td class="small"><a href="mailto:@m.Email">@m.Email</a></td>
+                        <td class="small text-muted">
+                            @(m.Message.Length > 60 ? m.Message.Substring(0, 60) + "..." : m.Message)
+                        </td>
+                        <td class="small text-muted">@m.CreatedAt.ToString("dd/MM/yy HH:mm")</td>
+                        <td>
+                            <a href="@Url.Action("Details",new{id=m.Id})" class="btn btn-sm btn-outline-secondary me-1">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            @using (Html.BeginForm("Delete","Messages",new{area="Admin",id=m.Id},FormMethod.Post,new{@class="d-inline",onsubmit="return confirm('¿Eliminar?')"}))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-envelope-x fs-1 d-block mb-2"></i>
+            No hay mensajes aún.
+        </div>
+    }
+</div>

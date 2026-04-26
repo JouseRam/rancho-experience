@@ -1,0 +1,345 @@
+@model RanchoMvc.Models.ViewModels.HomeViewModel
+@{
+    ViewBag.Title = Model.Setting("BusinessName", "Rancho El Pato");
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var hasVideo = !string.IsNullOrEmpty(Model.Setting("HeroVideoUrl"));
+}
+
+<!-- ===== HERO ===== -->
+<section class="hero-section" id="inicio">
+    @if (hasVideo)
+    {
+        <video class="hero-video" autoplay muted loop playsinline poster="@Model.Setting("HeroImageUrl")">
+            <source src="@Model.Setting("HeroVideoUrl")" type="video/mp4" />
+        </video>
+    }
+    else
+    {
+        <div class="hero-bg" style="background-image:url('@Model.Setting("HeroImageUrl")')"></div>
+    }
+    <div class="hero-overlay"></div>
+    <div class="container hero-content text-center text-white">
+        <p class="hero-tag">Rancho El Pato · Experiencias Auténticas</p>
+        <h1 class="hero-title">@Model.Setting("HeroTitle", "Vive la Naturaleza")</h1>
+        <p class="hero-subtitle">@Model.Setting("HeroSubtitle")</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap mt-4">
+            <a href="#reservar" class="btn btn-gold btn-hero">@Model.Setting("HeroCtaText","Reserva Tu Experiencia")</a>
+            <a href="#experiencias" class="btn btn-outline-light btn-hero">Ver Experiencias</a>
+        </div>
+    </div>
+    <a href="#experiencias" class="hero-scroll-indicator">
+        <i class="bi bi-chevron-down"></i>
+    </a>
+</section>
+
+<!-- ===== EXPERIENCIAS (Planes) ===== -->
+<section class="py-section bg-cream" id="experiencias">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <span class="section-tag">Nuestras Experiencias</span>
+            <h2 class="section-title mt-2">Momentos que duran toda la vida</h2>
+        </div>
+        <div class="row g-4 justify-content-center">
+            @foreach (var plan in Model.Plans)
+            {
+                <div class="col-md-4">
+                    <div class="exp-card">
+                        <div class="exp-icon-wrap">
+                            <i class="@plan.Icon"></i>
+                        </div>
+                        <h3 class="exp-title">@plan.Title</h3>
+                        <p class="exp-desc">@plan.Description</p>
+                        @if (!string.IsNullOrEmpty(plan.Includes))
+                        {
+                            <ul class="exp-includes list-unstyled">
+                                @foreach (var item in plan.Includes.Split('|'))
+                                {
+                                    <li><i class="bi bi-check2-circle me-2 text-success"></i>@item.Trim()</li>
+                                }
+                            </ul>
+                        }
+                        <div class="exp-footer">
+                            <span class="exp-price">@plan.PriceLabel</span>
+                            <a href="#reservar" class="btn btn-ranch-sm">Reservar</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ===== GALERÍA ===== -->
+<section class="py-section bg-dark-ranch" id="galeria">
+    <div class="container-fluid px-md-4">
+        <div class="section-header text-center mb-5">
+            <span class="section-tag text-gold-light">Galería</span>
+            <h2 class="section-title text-white mt-2">Descubre Nuestro Rancho</h2>
+        </div>
+        @if (Model.GalleryImages != null && Model.GalleryImages.Count > 0)
+        {
+            <div class="gallery-masonry">
+                @foreach (var img in Model.GalleryImages)
+                {
+                    <div class="gallery-item" onclick="openLightbox('@img.Url', '@img.AltText')">
+                        <img src="@img.Url" alt="@img.AltText" loading="lazy" />
+                        <div class="gallery-overlay">
+                            <i class="bi bi-zoom-in text-white fs-4"></i>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="gallery-placeholder-grid">
+                @for (int i = 1; i <= 9; i++)
+                {
+                    <div class="gallery-ph-item">
+                        <i class="bi bi-image text-white opacity-25 fs-1"></i>
+                        <span class="text-white-50 small">Rancho @i</span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<!-- ===== ABOUT / RANCHO STORY ===== -->
+<section class="py-section" id="nosotros">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-md-6">
+                @if (!string.IsNullOrEmpty(Model.Setting("AboutImageUrl")))
+                {
+                    <div class="about-img-wrap">
+                        <img src="@Model.Setting("AboutImageUrl")" alt="Rancho El Pato" class="about-img" />
+                        <div class="about-badge">
+                            <i class="fa-solid fa-house about-badge-icon"></i>
+                            <span>Rancho Story</span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-md-6">
+                <span class="section-tag">Nuestra Historia</span>
+                <h2 class="section-title mt-2">@Model.Setting("AboutTitle", "Un Refugio en la Naturaleza")</h2>
+                <div class="about-text mt-3">
+                    @foreach (var paragraph in Model.Setting("AboutText").Split('\n'))
+                    {
+                        if (!string.IsNullOrWhiteSpace(paragraph))
+                        {
+                            <p>@paragraph</p>
+                        }
+                    }
+                </div>
+                <div class="features-grid mt-4">
+                    <div class="feature-item">
+                        <i class="fa-solid fa-horse feature-emoji"></i>
+                        <div><strong>Paseo a caballo</strong><p>Explora paisajes increíbles con guías expertos</p></div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-house feature-emoji"></i>
+                        <div><strong>Hospedaje</strong><p>Alojamiento rústico de lujo en plena naturaleza</p></div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-champagne-glasses feature-emoji"></i>
+                        <div><strong>Eventos</strong><p>El escenario perfecto para celebraciones inolvidables</p></div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-tree feature-emoji"></i>
+                        <div><strong>Naturaleza</strong><p>Conexión pura con el entorno natural</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-section" id="reservar"
+    style="background-image:url('@Model.Setting("CtaBackgroundUrl")')">
+    <div class="cta-overlay"></div>
+    <div class="container cta-content text-center text-white">
+        <h2 class="cta-title">@Model.Setting("CtaTitle", "¿Listo para la Aventura?")</h2>
+        <p class="cta-subtitle">@Model.Setting("CtaSubtitle")</p>
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-8">
+                <div class="reservation-form-card">
+                    @using (Html.BeginForm("Quote", "Contact", FormMethod.Post, new { id = "quoteForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div id="quoteAlert" class="alert d-none mb-3"></div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.ReservationForm.CompanyName, new { @class = "form-control form-control-lg", placeholder = "Nombre de familia o grupo" })
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.ReservationForm.ContactName, new { @class = "form-control form-control-lg", placeholder = "Tu nombre" })
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.ReservationForm.Email, new { @class = "form-control form-control-lg", type = "email", placeholder = "Correo electrónico" })
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.ReservationForm.Phone, new { @class = "form-control form-control-lg", type = "tel", placeholder = "Teléfono" })
+                            </div>
+                            <div class="col-md-5">
+                                @Html.DropDownListFor(m => m.ReservationForm.PlanId, Model.ReservationForm.Plans, "— Experiencia —", new { @class = "form-select form-select-lg" })
+                            </div>
+                            <div class="col-md-4">
+                                @Html.TextBoxFor(m => m.ReservationForm.PreferredDate, "{0:yyyy-MM-dd}", new { @class = "form-control form-control-lg", type = "date" })
+                            </div>
+                            <div class="col-md-3">
+                                @Html.TextBoxFor(m => m.ReservationForm.GuestCount, new { @class = "form-control form-control-lg", type = "number", min = "1", max = "200", placeholder = "Personas" })
+                            </div>
+                            <div class="col-12">
+                                @Html.TextAreaFor(m => m.ReservationForm.Notes, new { @class = "form-control", rows = "2", placeholder = "Notas adicionales..." })
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-gold btn-lg w-100" id="quoteBtn">
+                                    <span class="btn-text">Reserva Tu Experiencia</span>
+                                    <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-2"></span>Enviando...</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CONTACTO ===== -->
+<section class="py-section bg-cream" id="contacto">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-md-5">
+                <span class="section-tag">Contacto</span>
+                <h2 class="section-title mt-2">¿Tienes alguna pregunta?</h2>
+                <div class="contact-list mt-4">
+                    <a href="tel:@Model.Setting("ContactPhone")" class="contact-list-item">
+                        <i class="bi bi-telephone-fill"></i>
+                        <span>@Model.Setting("ContactPhone", "+52 123 456 7890")</span>
+                    </a>
+                    <a href="mailto:@Model.Setting("ContactEmail")" class="contact-list-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span>@Model.Setting("ContactEmail", "info@ranchoelpato.com")</span>
+                    </a>
+                    <div class="contact-list-item">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>@Model.Setting("ContactAddress", "Camino al Rancho, México")</span>
+                    </div>
+                    <div class="contact-list-item">
+                        <i class="bi bi-clock-fill"></i>
+                        <span>@Model.Setting("BusinessHours", "Abierto todos los días · 9:00 AM – 6:00 PM")</span>
+                    </div>
+                </div>
+                @{
+                    var wa = Model.Setting("SocialWhatsapp");
+                    var ig = Model.Setting("SocialInstagram");
+                    var fb = Model.Setting("SocialFacebook");
+                }
+                @if (!string.IsNullOrEmpty(wa) || !string.IsNullOrEmpty(ig) || !string.IsNullOrEmpty(fb))
+                {
+                    <div class="social-links mt-4">
+                        @if (!string.IsNullOrEmpty(wa))
+                        {
+                            <a href="https://wa.me/@wa" class="social-btn whatsapp" target="_blank"><i class="bi bi-whatsapp"></i></a>
+                        }
+                        @if (!string.IsNullOrEmpty(ig))
+                        {
+                            <a href="@ig" class="social-btn instagram" target="_blank"><i class="bi bi-instagram"></i></a>
+                        }
+                        @if (!string.IsNullOrEmpty(fb))
+                        {
+                            <a href="@fb" class="social-btn facebook" target="_blank"><i class="bi bi-facebook"></i></a>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="col-md-7">
+                <div class="form-card p-4">
+                    @using (Html.BeginForm("Send", "Contact", FormMethod.Post, new { id = "contactForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div id="contactAlert" class="alert d-none"></div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.ContactForm.Name, new { @class = "form-control", placeholder = "Tu nombre *" })
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.ContactForm.Company, new { @class = "form-control", placeholder = "Ocasión o evento (opcional)" })
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.ContactForm.Email, new { @class = "form-control", type = "email", placeholder = "Correo electrónico *" })
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.ContactForm.Phone, new { @class = "form-control", type = "tel", placeholder = "Teléfono" })
+                            </div>
+                            <div class="col-12">
+                                @Html.TextAreaFor(m => m.ContactForm.Message, new { @class = "form-control", rows = "4", placeholder = "¿En qué podemos ayudarte? *" })
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-ranch w-100 py-3" id="contactBtn">
+                                    <span class="btn-text">Enviar Mensaje</span>
+                                    <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-2"></span>Enviando...</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox d-none" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()"><i class="bi bi-x-lg"></i></button>
+    <img id="lightboxImg" src="" alt="" />
+</div>
+
+@section Scripts {
+<script>
+    // AJAX Forms
+    function handleForm(formId, alertId, btnId) {
+        var form = document.getElementById(formId);
+        if (!form) return;
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var btn = document.getElementById(btnId);
+            btn.querySelector('.btn-text').classList.add('d-none');
+            btn.querySelector('.btn-loading').classList.remove('d-none');
+            btn.disabled = true;
+            var fd = new FormData(this);
+            fetch(this.action, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var alert = document.getElementById(alertId);
+                    alert.className = 'alert ' + (data.success ? 'alert-success' : 'alert-danger');
+                    alert.textContent = data.message;
+                    alert.classList.remove('d-none');
+                    if (data.success) form.reset();
+                    btn.querySelector('.btn-text').classList.remove('d-none');
+                    btn.querySelector('.btn-loading').classList.add('d-none');
+                    btn.disabled = false;
+                });
+        });
+    }
+    handleForm('quoteForm', 'quoteAlert', 'quoteBtn');
+    handleForm('contactForm', 'contactAlert', 'contactBtn');
+
+    // Lightbox
+    function openLightbox(url, alt) {
+        document.getElementById('lightboxImg').src = url;
+        document.getElementById('lightboxImg').alt = alt;
+        document.getElementById('lightbox').classList.remove('d-none');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.add('d-none');
+        document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLightbox(); });
+</script>
+}
