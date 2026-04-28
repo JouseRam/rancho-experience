@@ -129,6 +129,12 @@
     <Content Include="Scripts\**\*" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="appSecrets.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="connectionStrings.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
