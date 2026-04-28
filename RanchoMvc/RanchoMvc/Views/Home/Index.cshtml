@@ -216,12 +216,15 @@
                                             <i class="bi bi-cash-coin me-1" style="color:#C4882A;"></i>Efectivo / Ventanilla
                                         </label>
                                     </div>
-                                    <div class="form-check">
-                                        @Html.RadioButtonFor(m => m.ReservationForm.PaymentMethod, "online", new { @class = "form-check-input", id = "payOnline" })
-                                        <label class="form-check-label text-white" for="payOnline">
-                                            <i class="bi bi-credit-card me-1" style="color:#C4882A;"></i>Pago en Línea
-                                        </label>
-                                    </div>
+                                    @if (ViewBag.OnlinePaymentEnabled == true)
+                                    {
+                                        <div class="form-check">
+                                            @Html.RadioButtonFor(m => m.ReservationForm.PaymentMethod, "online", new { @class = "form-check-input", id = "payOnline" })
+                                            <label class="form-check-label text-white" for="payOnline">
+                                                <i class="bi bi-credit-card me-1" style="color:#C4882A;"></i>Pago en Línea
+                                            </label>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                             <div class="col-12">
