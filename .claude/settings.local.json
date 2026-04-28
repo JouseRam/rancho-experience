@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:ranch-landing-24107.fly-app.optidev.ai)",
-      "Bash(git -C c:/Users/ERAMIREZ16/rancho-experience ls-files backend frontend --error-unmatch)",
-      "Bash(git rm *)"
-    ]
-  }
-}
