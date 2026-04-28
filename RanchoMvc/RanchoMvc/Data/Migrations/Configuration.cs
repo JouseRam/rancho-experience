@@ -158,6 +158,10 @@ namespace RanchoMvc.Data.Migrations
                 EnsureSetting(context, "ColorAccent",     "Color café / detalles",    "color",        "Apariencia", "#5C3A1E");
                 EnsureSetting(context, "FontTitle",       "Fuente de títulos",        "font-select",  "Apariencia", "Playfair Display");
                 EnsureSetting(context, "FontBody",        "Fuente de texto",          "font-select",  "Apariencia", "Inter");
+                EnsureSetting(context, "BankName",        "Banco",                    "text",         "Pagos");
+                EnsureSetting(context, "BankHolder",      "Titular de la cuenta",     "text",         "Pagos");
+                EnsureSetting(context, "BankAccount",     "Número de cuenta",         "text",         "Pagos");
+                EnsureSetting(context, "BankCLABE",       "CLABE interbancaria",      "text",         "Pagos");
                 context.SaveChanges();
             }
         }

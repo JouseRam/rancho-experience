@@ -102,6 +102,7 @@
     <Compile Include="Models\ViewModels\LoginViewModel.cs" />
     <Compile Include="Data\RanchoDbContext.cs" />
     <Compile Include="Data\Migrations\Configuration.cs" />
+    <Compile Include="Services\EmailService.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ContactController.cs" />

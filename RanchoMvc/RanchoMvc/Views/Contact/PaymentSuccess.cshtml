@@ -1,0 +1,39 @@
+@{
+    ViewBag.Title = "Pago Exitoso";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var reservationNumber = ViewBag.ReservationNumber as string ?? "";
+    var contactName = ViewBag.ContactName as string ?? "";
+}
+
+<section style="min-height:70vh;display:flex;align-items:center;background:#f8f6f1;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-7 text-center">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill" style="font-size:5rem;color:#2D5016;"></i>
+                </div>
+                <h2 class="mb-3" style="font-family:'Playfair Display',serif;color:#2D5016;">¡Pago Exitoso!</h2>
+                @if (!string.IsNullOrEmpty(contactName))
+                {
+                    <p class="lead text-muted mb-2">Hola <strong>@contactName</strong>, tu pago fue aprobado.</p>
+                }
+                <p class="text-muted mb-4">En breve recibirás un correo de confirmación con todos los detalles.</p>
+
+                @if (!string.IsNullOrEmpty(reservationNumber))
+                {
+                    <div class="mb-4 p-4 rounded" style="background:#fff;border:2px solid #2D5016;display:inline-block;min-width:300px;">
+                        <p class="mb-1 text-muted small">Tu número de reservación</p>
+                        <p class="mb-0 fw-bold" style="font-size:2rem;color:#2D5016;letter-spacing:3px;">@reservationNumber</p>
+                        <small class="text-muted">Preséntalo el día de tu visita</small>
+                    </div>
+                }
+
+                <div class="mt-4">
+                    <a href="/" class="btn btn-lg px-5 py-3" style="background:#2D5016;color:white;">
+                        <i class="bi bi-house me-2"></i>Volver al inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -15,7 +15,7 @@ namespace RanchoMvc.Areas.Admin.Controllers
         private readonly RanchoDbContext _db = new RanchoDbContext();
 
         private static readonly List<string> GroupOrder = new List<string>
-            { "General", "Apariencia", "Hero", "About", "CTA", "Contacto", "Redes" };
+            { "General", "Apariencia", "Pagos", "Hero", "About", "CTA", "Contacto", "Redes" };
 
         public ActionResult Index()
         {

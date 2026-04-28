@@ -170,27 +170,59 @@
                     {
                         @Html.AntiForgeryToken()
                         <div id="quoteAlert" class="alert d-none mb-3"></div>
+                        <div id="reservationResult" class="d-none mb-3 p-4 text-center rounded" style="background:rgba(45,80,22,0.15);border:2px solid rgba(196,136,42,0.6);">
+                            <p class="mb-1 small" style="color:#C4882A;">Tu número de reservación</p>
+                            <p class="mb-1 fw-bold" style="font-size:2.2rem;color:white;letter-spacing:3px;" id="reservationNumberDisplay"></p>
+                            <small style="color:rgba(255,255,255,0.7);">Preséntalo al llegar y paga en ventanilla. Te enviamos los detalles por correo.</small>
+                        </div>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                @Html.TextBoxFor(m => m.ReservationForm.CompanyName, new { @class = "form-control form-control-lg", placeholder = "Nombre de familia o grupo" })
+                                @Html.TextBoxFor(m => m.ReservationForm.CompanyName, new { @class = "form-control form-control-lg", placeholder = "Nombre de familia o grupo (opcional)" })
                             </div>
                             <div class="col-md-6">
-                                @Html.TextBoxFor(m => m.ReservationForm.ContactName, new { @class = "form-control form-control-lg", placeholder = "Tu nombre" })
+                                @Html.TextBoxFor(m => m.ReservationForm.ContactName, new { @class = "form-control form-control-lg", placeholder = "Tu nombre *" })
                             </div>
                             <div class="col-md-6">
-                                @Html.TextBoxFor(m => m.ReservationForm.Email, new { @class = "form-control form-control-lg", type = "email", placeholder = "Correo electrónico" })
+                                @Html.TextBoxFor(m => m.ReservationForm.Email, new { @class = "form-control form-control-lg", type = "email", placeholder = "Correo electrónico *" })
                             </div>
                             <div class="col-md-6">
-                                @Html.TextBoxFor(m => m.ReservationForm.Phone, new { @class = "form-control form-control-lg", type = "tel", placeholder = "Teléfono" })
+                                @Html.TextBoxFor(m => m.ReservationForm.Phone, new { @class = "form-control form-control-lg", type = "tel", placeholder = "Teléfono *" })
                             </div>
-                            <div class="col-md-5">
-                                @Html.DropDownListFor(m => m.ReservationForm.PlanId, Model.ReservationForm.Plans, "— Experiencia —", new { @class = "form-select form-select-lg" })
+                            <div class="col-md-6">
+                                @Html.DropDownListFor(m => m.ReservationForm.PlanId, Model.ReservationForm.Plans, "— Selecciona tu experiencia —", new { @class = "form-select form-select-lg" })
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 @Html.TextBoxFor(m => m.ReservationForm.PreferredDate, "{0:yyyy-MM-dd}", new { @class = "form-control form-control-lg", type = "date" })
                             </div>
-                            <div class="col-md-3">
-                                @Html.TextBoxFor(m => m.ReservationForm.GuestCount, new { @class = "form-control form-control-lg", type = "number", min = "1", max = "200", placeholder = "Personas" })
+                            <div class="col-md-4">
+                                @Html.TextBoxFor(m => m.ReservationForm.NumberOfCars, new { @class = "form-control form-control-lg", type = "number", min = "1", max = "50", placeholder = "Núm. de autos *", id = "inputCars" })
+                            </div>
+                            <div class="col-md-4">
+                                @Html.TextBoxFor(m => m.ReservationForm.GuestCount, new { @class = "form-control form-control-lg", type = "number", min = "0", max = "500", placeholder = "Personas (opcional)" })
+                            </div>
+                            <div class="col-md-4" id="priceEstimate" style="display:none;">
+                                <div class="w-100 text-center rounded p-2" style="background:rgba(196,136,42,0.18);border:1px solid #C4882A;">
+                                    <small class="text-warning-emphasis d-block">Total estimado</small>
+                                    <strong class="fs-5" style="color:#C4882A;">$<span id="priceTotal">0</span> MXN</strong>
+                                    <small class="d-block text-muted" id="priceDetail"></small>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-white-50 small mb-2">Forma de pago</label>
+                                <div class="d-flex gap-4 flex-wrap">
+                                    <div class="form-check">
+                                        @Html.RadioButtonFor(m => m.ReservationForm.PaymentMethod, "ventanilla", new { @class = "form-check-input", id = "payVentanilla" })
+                                        <label class="form-check-label text-white" for="payVentanilla">
+                                            <i class="bi bi-cash-coin me-1" style="color:#C4882A;"></i>Efectivo / Ventanilla
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        @Html.RadioButtonFor(m => m.ReservationForm.PaymentMethod, "online", new { @class = "form-check-input", id = "payOnline" })
+                                        <label class="form-check-label text-white" for="payOnline">
+                                            <i class="bi bi-credit-card me-1" style="color:#C4882A;"></i>Pago en Línea
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-12">
                                 @Html.TextAreaFor(m => m.ReservationForm.Notes, new { @class = "form-control", rows = "2", placeholder = "Notas adicionales..." })
@@ -301,33 +333,108 @@
 
 @section Scripts {
 <script>
-    // AJAX Forms
-    function handleForm(formId, alertId, btnId) {
-        var form = document.getElementById(formId);
-        if (!form) return;
-        form.addEventListener('submit', function (e) {
+    // Precios de planes para calculadora
+    var planPrices = {};
+    @foreach (var p in Model.Plans)
+    {
+        @:planPrices[@p.Id] = @p.Price;
+    }
+
+    // Calculadora de precio estimado
+    function updatePrice() {
+        var planSel = document.querySelector('[name="ReservationForm.PlanId"]');
+        var carsInput = document.getElementById('inputCars');
+        var planId = planSel ? parseInt(planSel.value) : 0;
+        var cars = carsInput ? parseInt(carsInput.value) : 0;
+        var estimate = document.getElementById('priceEstimate');
+        if (planId && cars > 0 && planPrices[planId]) {
+            var total = planPrices[planId] * cars;
+            document.getElementById('priceTotal').textContent = total.toLocaleString('es-MX');
+            document.getElementById('priceDetail').textContent = cars + ' auto' + (cars > 1 ? 's' : '') + ' × $' + planPrices[planId].toLocaleString('es-MX');
+            estimate.style.display = 'block';
+        } else {
+            estimate.style.display = 'none';
+        }
+    }
+    var planSelectEl = document.querySelector('[name="ReservationForm.PlanId"]');
+    var carsEl = document.getElementById('inputCars');
+    if (planSelectEl) { planSelectEl.addEventListener('change', updatePrice); }
+    if (carsEl) { carsEl.addEventListener('input', updatePrice); }
+
+    // Formulario de cotización
+    var quoteForm = document.getElementById('quoteForm');
+    if (quoteForm) {
+        quoteForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            var btn = document.getElementById(btnId);
+            var btn = document.getElementById('quoteBtn');
             btn.querySelector('.btn-text').classList.add('d-none');
             btn.querySelector('.btn-loading').classList.remove('d-none');
             btn.disabled = true;
             var fd = new FormData(this);
             fetch(this.action, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var alert = document.getElementById(alertId);
-                    alert.className = 'alert ' + (data.success ? 'alert-success' : 'alert-danger');
-                    alert.textContent = data.message;
-                    alert.classList.remove('d-none');
-                    if (data.success) form.reset();
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    // Pago en línea — redirigir a MercadoPago
+                    if (data.success && data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                        return;
+                    }
+
+                    var alertEl = document.getElementById('quoteAlert');
+                    var resultEl = document.getElementById('reservationResult');
+                    var peEl = document.getElementById('priceEstimate');
+
+                    if (data.success && data.reservationNumber) {
+                        // Ventanilla — mostrar número de reservación
+                        alertEl.classList.add('d-none');
+                        document.getElementById('reservationNumberDisplay').textContent = data.reservationNumber;
+                        resultEl.classList.remove('d-none');
+                        quoteForm.reset();
+                        if (peEl) { peEl.style.display = 'none'; }
+                    } else {
+                        // Error
+                        resultEl.classList.add('d-none');
+                        alertEl.className = 'alert alert-danger';
+                        alertEl.textContent = data.message || 'Ocurrió un error. Por favor intenta de nuevo.';
+                        alertEl.classList.remove('d-none');
+                    }
+
+                    btn.querySelector('.btn-text').classList.remove('d-none');
+                    btn.querySelector('.btn-loading').classList.add('d-none');
+                    btn.disabled = false;
+                })
+                .catch(function () {
                     btn.querySelector('.btn-text').classList.remove('d-none');
                     btn.querySelector('.btn-loading').classList.add('d-none');
                     btn.disabled = false;
                 });
         });
     }
-    handleForm('quoteForm', 'quoteAlert', 'quoteBtn');
-    handleForm('contactForm', 'contactAlert', 'contactBtn');
+
+    // Formulario de contacto
+    var contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var btn = document.getElementById('contactBtn');
+            btn.querySelector('.btn-text').classList.add('d-none');
+            btn.querySelector('.btn-loading').classList.remove('d-none');
+            btn.disabled = true;
+            var fd = new FormData(this);
+            fetch(this.action, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    var alertEl = document.getElementById('contactAlert');
+                    alertEl.className = 'alert ' + (data.success ? 'alert-success' : 'alert-danger');
+                    alertEl.textContent = data.message;
+                    alertEl.classList.remove('d-none');
+                    if (data.success) contactForm.reset();
+                    btn.querySelector('.btn-text').classList.remove('d-none');
+                    btn.querySelector('.btn-loading').classList.add('d-none');
+                    btn.disabled = false;
+                });
+        });
+    }
 
     // Lightbox
     function openLightbox(url, alt) {

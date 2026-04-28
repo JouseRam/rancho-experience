@@ -29,9 +29,17 @@ namespace RanchoMvc.Models.ViewModels
         [Display(Name = "Fecha preferida")]
         public DateTime? PreferredDate { get; set; }
 
-        [Range(1, 500, ErrorMessage = "Entre 1 y 500 personas")]
+        [Range(0, 500, ErrorMessage = "Entre 0 y 500 personas")]
         [Display(Name = "Número de personas")]
-        public int GuestCount { get; set; } = 1;
+        public int GuestCount { get; set; }
+
+        [Required(ErrorMessage = "Indica el número de autos")]
+        [Range(1, 50, ErrorMessage = "Entre 1 y 50 autos")]
+        [Display(Name = "Número de autos")]
+        public int NumberOfCars { get; set; }
+
+        [Display(Name = "Forma de pago")]
+        public string PaymentMethod { get; set; } = "ventanilla";
 
         [Display(Name = "Notas adicionales")]
         public string Notes { get; set; }
