@@ -11,6 +11,8 @@ namespace RanchoMvc.Models
 {
     public class ApplicationUser : IdentityUser
     {
+        public bool IsSuperAdmin { get; set; }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             return await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);

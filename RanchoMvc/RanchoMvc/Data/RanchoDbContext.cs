@@ -15,6 +15,7 @@ namespace RanchoMvc.Data
         public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; }
+        public DbSet<UserModulePermission> UserModulePermissions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -25,6 +26,12 @@ namespace RanchoMvc.Data
             modelBuilder.Entity<ContactMessage>().ToTable("ContactMessages");
             modelBuilder.Entity<Reservation>().ToTable("Reservations");
             modelBuilder.Entity<SiteSetting>().ToTable("SiteSettings");
+            modelBuilder.Entity<UserModulePermission>().ToTable("UserModulePermissions");
+            modelBuilder.Entity<UserModulePermission>()
+                .HasRequired(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .WillCascadeOnDelete(true);
         }
     }
 }

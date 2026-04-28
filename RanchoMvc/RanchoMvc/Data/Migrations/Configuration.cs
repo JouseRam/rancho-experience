@@ -28,10 +28,15 @@ namespace RanchoMvc.Data.Migrations
             var adminEmail = System.Configuration.ConfigurationManager.AppSettings["AdminEmail"] ?? "admin@rancho.com";
             var adminPassword = System.Configuration.ConfigurationManager.AppSettings["AdminPassword"] ?? "Rancho2025!";
 
-            if (context.Users.Any(u => u.Email == adminEmail)) return;
+            var existing = context.Users.FirstOrDefault(u => u.Email == adminEmail);
+            if (existing != null)
+            {
+                if (!existing.IsSuperAdmin) { existing.IsSuperAdmin = true; context.SaveChanges(); }
+                return;
+            }
 
             var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(context));
-            var user = new ApplicationUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+            var user = new ApplicationUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true, IsSuperAdmin = true };
             var result = userManager.Create(user, adminPassword);
             if (!result.Succeeded)
                 throw new Exception("Error creando admin: " + string.Join(", ", result.Errors));

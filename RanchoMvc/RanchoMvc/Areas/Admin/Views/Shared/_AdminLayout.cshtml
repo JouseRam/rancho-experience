@@ -48,35 +48,75 @@
             <p class="sidebar-brand-title"><i class="fa-solid fa-leaf me-2"></i>Rancho Experience</p>
             <p class="sidebar-brand-sub">Panel de Administración</p>
         </div>
+        @{
+            bool _isSA = ViewBag.IsSuperAdmin == true;
+            var _perms = ViewBag.UserPerms as System.Collections.Generic.Dictionary<string, RanchoMvc.Models.UserModulePermission>;
+            Func<string, bool> _canView = m => _isSA || (_perms != null && _perms.ContainsKey(m) && _perms[m].CanView);
+            string _ctrl = (string)ViewContext.RouteData.Values["controller"] ?? "";
+        }
         <nav class="sidebar-nav">
             <div class="nav-section">Principal</div>
             <a href="@Url.Action("Index","Dashboard",new{area="Admin"})"
-               class="nav-link @((string)ViewContext.RouteData.Values["controller"]=="Dashboard"?"active":"")">
+               class="nav-link @(_ctrl=="Dashboard"?"active":"")">
                 <i class="bi bi-grid-1x2"></i> Dashboard
             </a>
-            <div class="nav-section">Contenido</div>
-            <a href="@Url.Action("Index","Plans",new{area="Admin"})"
-               class="nav-link @((string)ViewContext.RouteData.Values["controller"]=="Plans"?"active":"")">
-                <i class="bi bi-card-list"></i> Planes
-            </a>
-            <a href="@Url.Action("Index","Gallery",new{area="Admin"})"
-               class="nav-link @((string)ViewContext.RouteData.Values["controller"]=="Gallery"?"active":"")">
-                <i class="bi bi-images"></i> Galería
-            </a>
-            <div class="nav-section">Negocio</div>
-            <a href="@Url.Action("Index","Reservations",new{area="Admin"})"
-               class="nav-link @((string)ViewContext.RouteData.Values["controller"]=="Reservations"?"active":"")">
-                <i class="bi bi-calendar-check"></i> Cotizaciones
-            </a>
-            <a href="@Url.Action("Index","Messages",new{area="Admin"})"
-               class="nav-link @((string)ViewContext.RouteData.Values["controller"]=="Messages"?"active":"")">
-                <i class="bi bi-envelope"></i> Mensajes
-            </a>
-            <div class="nav-section">Configuración</div>
-            <a href="@Url.Action("Index","Settings",new{area="Admin"})"
-               class="nav-link @((string)ViewContext.RouteData.Values["controller"]=="Settings"?"active":"")">
-                <i class="bi bi-sliders"></i> Ajustes del Sitio
-            </a>
+
+            @if (_canView(RanchoMvc.Models.AdminModule.Plans) || _canView(RanchoMvc.Models.AdminModule.Gallery))
+            {
+                <div class="nav-section">Contenido</div>
+                if (_canView(RanchoMvc.Models.AdminModule.Plans))
+                {
+                    <a href="@Url.Action("Index","Plans",new{area="Admin"})"
+                       class="nav-link @(_ctrl=="Plans"?"active":"")">
+                        <i class="bi bi-card-list"></i> Planes
+                    </a>
+                }
+                if (_canView(RanchoMvc.Models.AdminModule.Gallery))
+                {
+                    <a href="@Url.Action("Index","Gallery",new{area="Admin"})"
+                       class="nav-link @(_ctrl=="Gallery"?"active":"")">
+                        <i class="bi bi-images"></i> Galería
+                    </a>
+                }
+            }
+
+            @if (_canView(RanchoMvc.Models.AdminModule.Reservations) || _canView(RanchoMvc.Models.AdminModule.Messages))
+            {
+                <div class="nav-section">Negocio</div>
+                if (_canView(RanchoMvc.Models.AdminModule.Reservations))
+                {
+                    <a href="@Url.Action("Index","Reservations",new{area="Admin"})"
+                       class="nav-link @(_ctrl=="Reservations"?"active":"")">
+                        <i class="bi bi-calendar-check"></i> Cotizaciones
+                    </a>
+                }
+                if (_canView(RanchoMvc.Models.AdminModule.Messages))
+                {
+                    <a href="@Url.Action("Index","Messages",new{area="Admin"})"
+                       class="nav-link @(_ctrl=="Messages"?"active":"")">
+                        <i class="bi bi-envelope"></i> Mensajes
+                    </a>
+                }
+            }
+
+            @if (_canView(RanchoMvc.Models.AdminModule.Settings) || _isSA)
+            {
+                <div class="nav-section">Configuración</div>
+                if (_canView(RanchoMvc.Models.AdminModule.Settings))
+                {
+                    <a href="@Url.Action("Index","Settings",new{area="Admin"})"
+                       class="nav-link @(_ctrl=="Settings"?"active":"")">
+                        <i class="bi bi-sliders"></i> Ajustes del Sitio
+                    </a>
+                }
+                if (_isSA)
+                {
+                    <a href="@Url.Action("Index","Users",new{area="Admin"})"
+                       class="nav-link @(_ctrl=="Users"?"active":"")">
+                        <i class="bi bi-people"></i> Usuarios
+                    </a>
+                }
+            }
         </nav>
         <div class="sidebar-footer">
             @using (Html.BeginForm("Logout","Account",FormMethod.Post, new{area=""}))

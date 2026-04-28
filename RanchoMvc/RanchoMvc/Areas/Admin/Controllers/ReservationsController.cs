@@ -1,11 +1,13 @@
 using System.Linq;
 using System.Web.Mvc;
 using RanchoMvc.Data;
+using RanchoMvc.Filters;
+using RanchoMvc.Models;
 
 namespace RanchoMvc.Areas.Admin.Controllers
 {
-    [Authorize]
-    public class ReservationsController : Controller
+    [ModuleAuthorize(Module = AdminModule.Reservations)]
+    public class ReservationsController : BaseAdminController
     {
         private readonly RanchoDbContext _db = new RanchoDbContext();
 

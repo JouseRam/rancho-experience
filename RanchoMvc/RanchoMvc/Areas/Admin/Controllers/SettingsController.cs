@@ -6,11 +6,13 @@ using System.Web.Mvc;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using RanchoMvc.Data;
+using RanchoMvc.Filters;
+using RanchoMvc.Models;
 
 namespace RanchoMvc.Areas.Admin.Controllers
 {
-    [Authorize]
-    public class SettingsController : Controller
+    [ModuleAuthorize(Module = AdminModule.Settings)]
+    public class SettingsController : BaseAdminController
     {
         private readonly RanchoDbContext _db = new RanchoDbContext();
 

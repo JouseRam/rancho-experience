@@ -1,12 +1,13 @@
 using System.Linq;
 using System.Web.Mvc;
 using RanchoMvc.Data;
+using RanchoMvc.Filters;
 using RanchoMvc.Models;
 
 namespace RanchoMvc.Areas.Admin.Controllers
 {
-    [Authorize]
-    public class PlansController : Controller
+    [ModuleAuthorize(Module = AdminModule.Plans)]
+    public class PlansController : BaseAdminController
     {
         private readonly RanchoDbContext _db = new RanchoDbContext();
 

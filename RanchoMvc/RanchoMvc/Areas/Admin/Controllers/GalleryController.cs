@@ -5,12 +5,13 @@ using System.Web.Mvc;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using RanchoMvc.Data;
+using RanchoMvc.Filters;
 using RanchoMvc.Models;
 
 namespace RanchoMvc.Areas.Admin.Controllers
 {
-    [Authorize]
-    public class GalleryController : Controller
+    [ModuleAuthorize(Module = AdminModule.Gallery)]
+    public class GalleryController : BaseAdminController
     {
         private readonly RanchoDbContext _db = new RanchoDbContext();
 

@@ -1,16 +1,20 @@
 using System.Linq;
 using System.Web.Mvc;
 using RanchoMvc.Data;
+using RanchoMvc.Filters;
 
 namespace RanchoMvc.Areas.Admin.Controllers
 {
-    [Authorize]
-    public class DashboardController : Controller
+    [ModuleAuthorize]
+    public class DashboardController : BaseAdminController
     {
         private readonly RanchoDbContext _db = new RanchoDbContext();
 
-        public ActionResult Index()
+        public ActionResult Index(string permError = null)
         {
+            if (!string.IsNullOrEmpty(permError))
+                TempData["Error"] = "No tienes permiso para acceder a esa sección.";
+
             ViewBag.TotalPlans = _db.Plans.Count(p => p.IsActive);
             ViewBag.PendingReservations = _db.Reservations.Count(r => r.Status == "Pendiente");
             ViewBag.UnreadMessages = _db.ContactMessages.Count(m => !m.IsRead);
