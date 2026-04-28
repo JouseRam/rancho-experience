@@ -436,6 +436,7 @@ backend/**/appsettings.Production.json
 # ============================================================
 RanchoMvc/RanchoMvc/connectionStrings.config
 RanchoMvc/RanchoMvc/appSecrets.config
+RanchoMvc/RanchoMvc/Web.Release.config
 # Deploy scripts con credenciales
 deploy-ftp.ps1
 # Carpeta de publicacion local
