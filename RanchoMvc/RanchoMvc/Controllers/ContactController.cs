@@ -132,7 +132,7 @@ namespace RanchoMvc.Controllers
                 return new HttpStatusCodeResult(200);
 
             var accessToken = System.Configuration.ConfigurationManager.AppSettings["MercadoPagoAccessToken"];
-            if (string.IsNullOrEmpty(accessToken) || accessToken == "REEMPLAZAR")
+            if (string.IsNullOrEmpty(accessToken) || accessToken == "APP_USR-625627838539381-042817-fb7b622010feea3809473da24564ea91-206345189")
                 return new HttpStatusCodeResult(200);
 
             try
@@ -209,7 +209,7 @@ namespace RanchoMvc.Controllers
         private string CreateMpPreference(Reservation reservation, Plan plan, decimal total)
         {
             var accessToken = System.Configuration.ConfigurationManager.AppSettings["MercadoPagoAccessToken"];
-            if (string.IsNullOrEmpty(accessToken) || accessToken == "REEMPLAZAR") return null;
+            if (string.IsNullOrEmpty(accessToken) || accessToken == "APP_USR-625627838539381-042817-fb7b622010feea3809473da24564ea91-206345189") return null;
 
             var baseUrl = (System.Configuration.ConfigurationManager.AppSettings["SiteBaseUrl"] ?? "https://ranchoelpato.somee.com").TrimEnd('/');
 
