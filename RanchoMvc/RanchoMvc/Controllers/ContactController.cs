@@ -13,7 +13,7 @@ namespace RanchoMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Send(ContactViewModel vm)
+        public ActionResult Send([Bind(Prefix = "ContactForm")] ContactViewModel vm)
         {
             if (!ModelState.IsValid)
                 return Json(new { success = false, message = "Datos inválidos." });
@@ -35,7 +35,7 @@ namespace RanchoMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Quote(ReservationViewModel vm)
+        public ActionResult Quote([Bind(Prefix = "ReservationForm")] ReservationViewModel vm)
         {
             if (!ModelState.IsValid)
                 return Json(new { success = false, message = "Por favor completa los campos requeridos." });

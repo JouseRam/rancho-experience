@@ -7,8 +7,7 @@ namespace RanchoMvc.Models.ViewModels
 {
     public class ReservationViewModel
     {
-        [Required(ErrorMessage = "El nombre de la empresa es requerido")]
-        [Display(Name = "Empresa")]
+        [Display(Name = "Familia / Grupo (opcional)")]
         public string CompanyName { get; set; }
 
         [Required(ErrorMessage = "El nombre de contacto es requerido")]
