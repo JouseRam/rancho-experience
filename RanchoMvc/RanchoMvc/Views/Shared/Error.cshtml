@@ -1,0 +1,29 @@
+@model System.Web.Mvc.HandleErrorInfo
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Error</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; background: #f8f8f8; }
+        .box { background: #fff; border: 1px solid #ddd; padding: 30px; max-width: 800px; margin: 0 auto; border-radius: 4px; }
+        h1 { color: #c00; }
+        pre { background: #f4f4f4; padding: 15px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Se produjo un error</h1>
+        @if (Model != null)
+        {
+            <p><strong>Controlador:</strong> @Model.ControllerName</p>
+            <p><strong>Acción:</strong> @Model.ActionName</p>
+            <p><strong>Excepción:</strong> @Model.Exception.Message</p>
+            <pre>@Model.Exception.ToString()</pre>
+        }
+    </div>
+</body>
+</html>
