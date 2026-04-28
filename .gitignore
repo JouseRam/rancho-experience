@@ -431,7 +431,12 @@ backend/**/appsettings.Production.json
 # Secrets
 *.env
 .env.local
-
+# ============================================================
+# Configuracion local del proyecto (NO subir al repo)
+# ============================================================
+RanchoMvc/RanchoMvc/connectionStrings.config
+RanchoMvc/RanchoMvc/appSecrets.config
+RanchoMvc/RanchoMvc/Web.Release.config
 # Deploy scripts con credenciales
 deploy-ftp.ps1
 # Carpeta de publicacion local
