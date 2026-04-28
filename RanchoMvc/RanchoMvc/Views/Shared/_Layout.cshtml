@@ -11,14 +11,39 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/Content/site.css" />
+@{
+    var _ss = ViewBag.SiteSettings as System.Collections.Generic.Dictionary<string, string>;
+    if (_ss == null) { _ss = new System.Collections.Generic.Dictionary<string, string>(); }
+    string _colorPrimary, _colorSecondary, _colorAccent, _fontTitle, _fontBody;
+    if (!_ss.TryGetValue("ColorPrimary", out _colorPrimary) || string.IsNullOrEmpty(_colorPrimary)) { _colorPrimary = "#2D5016"; }
+    if (!_ss.TryGetValue("ColorSecondary", out _colorSecondary) || string.IsNullOrEmpty(_colorSecondary)) { _colorSecondary = "#C4882A"; }
+    if (!_ss.TryGetValue("ColorAccent", out _colorAccent) || string.IsNullOrEmpty(_colorAccent)) { _colorAccent = "#5C3A1E"; }
+    if (!_ss.TryGetValue("FontTitle", out _fontTitle) || string.IsNullOrEmpty(_fontTitle)) { _fontTitle = "Playfair Display"; }
+    if (!_ss.TryGetValue("FontBody", out _fontBody) || string.IsNullOrEmpty(_fontBody)) { _fontBody = "Inter"; }
+    var _gfTitle = _fontTitle.Replace(" ", "+");
+    var _gfBody  = _fontBody.Replace(" ", "+");
+}
+    <!-- Google Fonts (dinámico según ajustes) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=@_gfTitle:wght@400;600;700&family=@_gfBody:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <!-- Variables de apariencia (desde Ajustes del Sitio) -->
+    <style>
+        :root {
+            --green:  @_colorPrimary;
+            --green2: @_colorPrimary;
+            --gold:   @_colorSecondary;
+            --gold2:  @_colorSecondary;
+            --brown:  @_colorAccent;
+        }
+        body { font-family: '@_fontBody', sans-serif; }
+        h1,h2,h3,h4,h5 { font-family: '@_fontTitle', Georgia, serif; }
+        .brand-text { font-family: '@_fontTitle', serif; }
+    </style>
 </head>
 <body>
 

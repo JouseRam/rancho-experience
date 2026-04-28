@@ -14,16 +14,19 @@ namespace RanchoMvc.Controllers
         protected override void OnActionExecuted(ActionExecutedContext filterContext)
         {
             base.OnActionExecuted(filterContext);
-            var logoUrl = HttpRuntime.Cache["SiteLogoUrl"] as string;
-            if (logoUrl == null)
+            var settings = HttpRuntime.Cache["SiteSettings"] as System.Collections.Generic.Dictionary<string, string>;
+            if (settings == null)
             {
-                var s = Db.SiteSettings.FirstOrDefault(x => x.Key == "LogoUrl");
-                logoUrl = s != null ? s.Value : "";
-                HttpRuntime.Cache.Insert("SiteLogoUrl", logoUrl, null,
+                settings = new System.Collections.Generic.Dictionary<string, string>();
+                foreach (var s in Db.SiteSettings.ToList())
+                    settings[s.Key] = s.Value;
+                HttpRuntime.Cache.Insert("SiteSettings", settings, null,
                     DateTime.UtcNow.AddMinutes(10),
                     System.Web.Caching.Cache.NoSlidingExpiration);
             }
-            ViewBag.LogoUrl = logoUrl;
+            ViewBag.SiteSettings = settings;
+            string logo;
+            ViewBag.LogoUrl = settings.TryGetValue("LogoUrl", out logo) ? logo : "";
         }
 
         protected override void Dispose(bool disposing)

@@ -3,11 +3,13 @@
     ViewBag.Title = "Ajustes del Sitio";
     var groups = ViewBag.Groups as List<string>;
     var uploadUrl = Url.Action("UploadFile", "Settings", new { area = "Admin" });
+    var fontTitleOptions = new[] { "Playfair Display", "Merriweather", "Lora", "Cormorant Garamond", "Georgia" };
+    var fontBodyOptions  = new[] { "Inter", "Open Sans", "Roboto", "Lato", "Nunito" };
 }
 
 <div class="mb-4">
     <h5 class="mb-1 fw-semibold">Ajustes del Sitio</h5>
-    <p class="text-muted small mb-0">Edita textos, imágenes y videos que aparecen en la página pública.</p>
+    <p class="text-muted small mb-0">Personaliza colores, fuentes, textos e imágenes del sitio público.</p>
 </div>
 
 <form method="post" action="@Url.Action("Save","Settings",new{area="Admin"})">
@@ -15,7 +17,7 @@
 
     <div class="d-flex justify-content-end mb-3">
         <button type="submit" class="btn px-4" style="background:#2D5016;color:white;">
-            <i class="bi bi-floppy me-2"></i>Guardar Cambios
+            <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios
         </button>
     </div>
 
@@ -23,71 +25,125 @@
     {
         <div class="stat-card mb-4">
             <h6 class="fw-semibold mb-3 pb-2 border-bottom">
-                @if (group == "Hero")       { <text><i class="fa-solid fa-film me-2"></i>Hero (Portada)</text> }
+                @if (group == "General")    { <text><i class="fa-solid fa-gear me-2"></i>General</text> }
+                else if (group == "Apariencia") { <text><i class="fa-solid fa-palette me-2"></i>Apariencia — Colores y Fuentes</text> }
+                else if (group == "Hero")   { <text><i class="fa-solid fa-film me-2"></i>Hero (Portada)</text> }
                 else if (group == "About")  { <text><i class="fa-solid fa-book me-2"></i>Nosotros / Historia</text> }
                 else if (group == "CTA")    { <text><i class="fa-solid fa-bullhorn me-2"></i>Sección CTA</text> }
                 else if (group == "Contacto") { <text><i class="fa-solid fa-phone me-2"></i>Información de Contacto</text> }
                 else if (group == "Redes")  { <text><i class="fa-solid fa-share-nodes me-2"></i>Redes Sociales</text> }
                 else { @group }
             </h6>
-            <div class="row g-3">
-                @foreach (var s in Model.Where(x => x.Group == group))
-                {
-                    <div class="col-12 @(s.Type == "text" || s.Type == "url" ? "col-md-6" : "")">
-                        <label class="form-label fw-medium small">@s.Label</label>
-                        @if (s.Type == "textarea")
-                        {
-                            <textarea name="setting_@s.Id" class="form-control" rows="3">@s.Value</textarea>
-                        }
-                        else if (s.Type == "video-url" || s.Type == "image-url")
-                        {
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fa-solid @(s.Type == "video-url" ? "fa-film" : "fa-image")"></i>
-                                </span>
-                                <input type="url" id="url_@s.Id" name="setting_@s.Id" class="form-control"
-                                       value="@s.Value" placeholder="https://..." />
-                                <label class="btn btn-outline-secondary mb-0 upload-btn" title="Subir archivo"
-                                       data-target="url_@s.Id"
-                                       data-preview="preview_@s.Id"
-                                       data-type="@s.Type">
-                                    <i class="fa-solid fa-upload"></i>
-                                    <input type="file" class="d-none"
-                                           accept="@(s.Type == "video-url" ? "video/*" : "image/*")" />
-                                </label>
-                            </div>
-                            <div id="preview_@s.Id" class="mt-2">
-                                @if (!string.IsNullOrEmpty(s.Value))
-                                {
-                                    if (s.Type == "image-url")
+
+            @if (group == "Apariencia")
+            {
+                <div class="row g-3">
+                    @foreach (var s in Model.Where(x => x.Group == "Apariencia"))
+                    {
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-medium small">@s.Label</label>
+                            @if (s.Type == "color")
+                            {
+                                var hex = string.IsNullOrEmpty(s.Value) ? "#000000" : s.Value;
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="color" class="color-picker"
+                                           data-target="txt_@s.Id"
+                                           value="@hex"
+                                           style="width:44px;height:38px;padding:2px;border:1px solid #ced4da;border-radius:6px;cursor:pointer;" />
+                                    <input type="text" id="txt_@s.Id" name="setting_@s.Id"
+                                           class="form-control form-control-sm font-monospace"
+                                           value="@hex" maxlength="7"
+                                           style="width:100px;" />
+                                    <span class="color-swatch rounded"
+                                          id="swatch_@s.Id"
+                                          style="width:32px;height:32px;background:@hex;border:1px solid #ced4da;display:inline-block;"></span>
+                                </div>
+                            }
+                            else if (s.Type == "font-select")
+                            {
+                                var opts = s.Key == "FontTitle" ? fontTitleOptions : fontBodyOptions;
+                                <select name="setting_@s.Id" class="form-select font-preview-select" data-key="@s.Key">
+                                    @foreach (var opt in opts)
                                     {
-                                        <img src="@s.Value" alt="Preview" class="rounded"
-                                             style="max-height:100px;max-width:100%;object-fit:cover;" />
+                                        if (opt == s.Value)
+                                        {
+                                            <option value="@opt" selected="selected" style="font-family:'@opt'">@opt</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@opt" style="font-family:'@opt'">@opt</option>
+                                        }
                                     }
-                                    else
+                                </select>
+                                <small class="text-muted mt-1 d-block font-preview" id="preview_font_@s.Id"
+                                       style="font-family:'@s.Value', serif; font-size:1rem;">
+                                    El rancho te espera — The quick brown fox
+                                </small>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="row g-3">
+                    @foreach (var s in Model.Where(x => x.Group == group))
+                    {
+                        <div class="col-12 @(s.Type == "text" || s.Type == "url" ? "col-md-6" : "")">
+                            <label class="form-label fw-medium small">@s.Label</label>
+                            @if (s.Type == "textarea")
+                            {
+                                <textarea name="setting_@s.Id" class="form-control" rows="3">@s.Value</textarea>
+                            }
+                            else if (s.Type == "video-url" || s.Type == "image-url")
+                            {
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fa-solid @(s.Type == "video-url" ? "fa-film" : "fa-image")"></i>
+                                    </span>
+                                    <input type="url" id="url_@s.Id" name="setting_@s.Id" class="form-control"
+                                           value="@s.Value" placeholder="https://..." />
+                                    <label class="btn btn-outline-secondary mb-0 upload-btn" title="Subir archivo"
+                                           data-target="url_@s.Id"
+                                           data-preview="preview_@s.Id"
+                                           data-type="@s.Type">
+                                        <i class="fa-solid fa-upload"></i>
+                                        <input type="file" class="d-none"
+                                               accept="@(s.Type == "video-url" ? "video/*" : "image/*")" />
+                                    </label>
+                                </div>
+                                <div id="preview_@s.Id" class="mt-2">
+                                    @if (!string.IsNullOrEmpty(s.Value))
                                     {
-                                        <p class="text-muted small mb-0">
-                                            <i class="fa-solid fa-film me-1"></i>
-                                            <a href="@s.Value" target="_blank">@s.Value</a>
-                                        </p>
+                                        if (s.Type == "image-url")
+                                        {
+                                            <img src="@s.Value" alt="Preview" class="rounded"
+                                                 style="max-height:100px;max-width:100%;object-fit:cover;" />
+                                        }
+                                        else
+                                        {
+                                            <p class="text-muted small mb-0">
+                                                <i class="fa-solid fa-film me-1"></i>
+                                                <a href="@s.Value" target="_blank">@s.Value</a>
+                                            </p>
+                                        }
                                     }
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <input type="text" name="setting_@s.Id" class="form-control"
-                                   value="@s.Value" />
-                        }
-                    </div>
-                }
-            </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <input type="text" name="setting_@s.Id" class="form-control" value="@s.Value" />
+                            }
+                        </div>
+                    }
+                </div>
+            }
         </div>
     }
 
     <div class="text-end">
         <button type="submit" class="btn btn-lg px-5" style="background:#2D5016;color:white;">
-            <i class="bi bi-floppy me-2"></i>Guardar Todos los Cambios
+            <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Todos los Cambios
         </button>
     </div>
 </form>
@@ -96,23 +152,60 @@
 <script>
     var uploadUrl = '@uploadUrl';
 
-    document.addEventListener('click', function (e) {
-        var btn = e.target.closest('.upload-btn');
-        if (!btn) return;
-        btn.querySelector('input[type=file]').click();
+    // Color picker — sincroniza picker ↔ texto ↔ swatch
+    document.addEventListener('input', function (e) {
+        if (e.target.classList.contains('color-picker')) {
+            var hex = e.target.value;
+            var txtId = e.target.dataset.target;
+            var txt = document.getElementById(txtId);
+            if (txt) txt.value = hex;
+            var swatchId = txtId.replace('txt_', 'swatch_');
+            var sw = document.getElementById(swatchId);
+            if (sw) sw.style.background = hex;
+        }
+        if (e.target.id && e.target.id.indexOf('txt_') === 0) {
+            var val = e.target.value;
+            if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+                var picker = document.querySelector('[data-target="' + e.target.id + '"]');
+                if (picker) picker.value = val;
+                var swatchId2 = e.target.id.replace('txt_', 'swatch_');
+                var sw2 = document.getElementById(swatchId2);
+                if (sw2) sw2.style.background = val;
+            }
+        }
     });
 
+    // Font select — actualiza preview en tiempo real y carga Google Font
     document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('font-preview-select')) {
+            var font = e.target.value;
+            var key  = e.target.dataset.key;
+            var previewId = 'preview_font_' + e.target.name.replace('setting_', '');
+            var preview = document.getElementById(previewId);
+            if (preview) preview.style.fontFamily = "'" + font + "', serif";
+
+            // Cargar fuente de Google Fonts si no está cargada
+            var linkId = 'gf_' + font.replace(/ /g, '_');
+            if (!document.getElementById(linkId)) {
+                var link = document.createElement('link');
+                link.id = linkId;
+                link.rel = 'stylesheet';
+                link.href = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;600;700&display=swap';
+                document.head.appendChild(link);
+            }
+        }
+
+        // Upload de archivos
         var fileInput = e.target;
         if (!fileInput || fileInput.type !== 'file') return;
         var btn = fileInput.closest('.upload-btn');
         if (!btn || !fileInput.files || !fileInput.files[0]) return;
 
-        var file      = fileInput.files[0];
-        var urlInput  = document.getElementById(btn.dataset.target);
-        var preview   = document.getElementById(btn.dataset.preview);
-        var type      = btn.dataset.type;
-        var icon      = btn.querySelector('i');
+        var file     = fileInput.files[0];
+        var urlInput = document.getElementById(btn.dataset.target);
+        var preview  = document.getElementById(btn.dataset.preview);
+        var type     = btn.dataset.type;
+        var icon     = btn.querySelector('i');
 
         icon.className = 'spinner-border spinner-border-sm';
         btn.classList.add('disabled');
@@ -120,11 +213,7 @@
         var fd = new FormData();
         fd.append('file', file);
 
-        fetch(uploadUrl, {
-            method: 'POST',
-            body: fd,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
+        fetch(uploadUrl, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(function (r) { return r.json(); })
         .then(function (data) {
             if (data.success) {
@@ -132,7 +221,7 @@
                 if (type === 'image-url') {
                     preview.innerHTML = '<img src="' + data.url + '" class="rounded" style="max-height:100px;max-width:100%;object-fit:cover;" />';
                 } else {
-                    preview.innerHTML = '<p class="text-muted small mb-0"><i class="fa-solid fa-film me-1"></i><a href="' + data.url + '" target="_blank">Video subido correctamente</a></p>';
+                    preview.innerHTML = '<p class="text-muted small mb-0"><i class="fa-solid fa-film me-1"></i><a href="' + data.url + '" target="_blank">Video subido</a></p>';
                 }
             } else {
                 alert('Error: ' + data.message);
@@ -144,6 +233,12 @@
             btn.classList.remove('disabled');
             fileInput.value = '';
         });
+    });
+
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.upload-btn');
+        if (!btn) return;
+        btn.querySelector('input[type=file]').click();
     });
 </script>
 }

@@ -152,7 +152,12 @@ namespace RanchoMvc.Data.Migrations
             else
             {
                 // BD existente — agregar solo los settings que falten
-                EnsureSetting(context, "LogoUrl", "Logo del Rancho", "image-url", "General");
+                EnsureSetting(context, "LogoUrl",         "Logo del Rancho",          "image-url",    "General");
+                EnsureSetting(context, "ColorPrimary",    "Color principal (verde)",  "color",        "Apariencia", "#2D5016");
+                EnsureSetting(context, "ColorSecondary",  "Color dorado / acentos",   "color",        "Apariencia", "#C4882A");
+                EnsureSetting(context, "ColorAccent",     "Color café / detalles",    "color",        "Apariencia", "#5C3A1E");
+                EnsureSetting(context, "FontTitle",       "Fuente de títulos",        "font-select",  "Apariencia", "Playfair Display");
+                EnsureSetting(context, "FontBody",        "Fuente de texto",          "font-select",  "Apariencia", "Inter");
                 context.SaveChanges();
             }
         }

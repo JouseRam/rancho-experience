@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -13,10 +14,16 @@ namespace RanchoMvc.Areas.Admin.Controllers
     {
         private readonly RanchoDbContext _db = new RanchoDbContext();
 
+        private static readonly List<string> GroupOrder = new List<string>
+            { "General", "Apariencia", "Hero", "About", "CTA", "Contacto", "Redes" };
+
         public ActionResult Index()
         {
-            var settings = _db.SiteSettings.OrderBy(s => s.Group).ThenBy(s => s.Id).ToList();
-            ViewBag.Groups = settings.Select(s => s.Group).Distinct().ToList();
+            var settings = _db.SiteSettings.OrderBy(s => s.Id).ToList();
+            var existing = settings.Select(s => s.Group).Distinct().ToList();
+            ViewBag.Groups = GroupOrder.Where(g => existing.Contains(g))
+                .Concat(existing.Where(g => !GroupOrder.Contains(g)))
+                .ToList();
             return View(settings);
         }
 
@@ -33,6 +40,7 @@ namespace RanchoMvc.Areas.Admin.Controllers
             }
             _db.SaveChanges();
             System.Web.HttpRuntime.Cache.Remove("SiteLogoUrl");
+            System.Web.HttpRuntime.Cache.Remove("SiteSettings");
             TempData["Success"] = "Ajustes guardados correctamente.";
             return RedirectToAction("Index");
         }
