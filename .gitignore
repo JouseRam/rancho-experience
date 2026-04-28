@@ -431,3 +431,11 @@ backend/**/appsettings.Production.json
 # Secrets
 *.env
 .env.local
+
+# Deploy scripts con credenciales
+deploy-ftp.ps1
+# Carpeta de publicacion local
+publish/
+# Backups de VS
+RanchoMvc/Backup/
+.claude/
