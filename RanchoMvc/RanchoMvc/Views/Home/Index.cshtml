@@ -122,7 +122,7 @@
                 }
             </div>
             <div class="col-md-6">
-                <span class="section-tag">Nuestra Historia</span>
+                <span class="section-tag">@Model.Setting("AboutTag", "Nuestra Historia")</span>
                 <h2 class="section-title mt-2">@Model.Setting("AboutTitle", "Un Refugio en la Naturaleza")</h2>
                 <div class="about-text mt-3">
                     @foreach (var paragraph in Model.Setting("AboutText").Split('\n'))
@@ -209,21 +209,21 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-semibold text-white-50 small mb-2">Forma de pago</label>
-                                <div class="d-flex gap-4 flex-wrap">
-                                    <div class="form-check">
-                                        @Html.RadioButtonFor(m => m.ReservationForm.PaymentMethod, "ventanilla", new { @class = "form-check-input", id = "payVentanilla" })
-                                        <label class="form-check-label text-white" for="payVentanilla">
-                                            <i class="bi bi-cash-coin me-1" style="color:#C4882A;"></i>Efectivo / Ventanilla
-                                        </label>
-                                    </div>
+                                <div class="d-flex gap-3 flex-wrap">
+                                    @Html.RadioButtonFor(m => m.ReservationForm.PaymentMethod, "ventanilla", new { @class = "btn-check", id = "payVentanilla", autocomplete = "off" })
+                                    <label class="pay-card" for="payVentanilla">
+                                        <i class="bi bi-cash-coin pay-icon"></i>
+                                        <span class="pay-label">Efectivo</span>
+                                        <span class="pay-sub">Pago en ventanilla</span>
+                                    </label>
                                     @if (ViewBag.OnlinePaymentEnabled == true)
                                     {
-                                        <div class="form-check">
-                                            @Html.RadioButtonFor(m => m.ReservationForm.PaymentMethod, "online", new { @class = "form-check-input", id = "payOnline" })
-                                            <label class="form-check-label text-white" for="payOnline">
-                                                <i class="bi bi-credit-card me-1" style="color:#C4882A;"></i>Pago en Línea
-                                            </label>
-                                        </div>
+                                        @Html.RadioButtonFor(m => m.ReservationForm.PaymentMethod, "online", new { @class = "btn-check", id = "payOnline", autocomplete = "off" })
+                                        <label class="pay-card" for="payOnline">
+                                            <i class="bi bi-credit-card pay-icon"></i>
+                                            <span class="pay-label">Pago en Línea</span>
+                                            <span class="pay-sub">Tarjeta / MercadoPago</span>
+                                        </label>
                                     }
                                 </div>
                             </div>

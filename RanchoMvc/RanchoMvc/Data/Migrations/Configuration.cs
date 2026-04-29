@@ -116,6 +116,8 @@ namespace RanchoMvc.Data.Migrations
                     Value = "Reserva Tu Experiencia" },
 
                 // About
+                new SiteSetting { Key = "AboutTag", Label = "Etiqueta superior (ej. Nuestra Historia)", Type = "text", Group = "About",
+                    Value = "Nuestra Historia" },
                 new SiteSetting { Key = "AboutTitle", Label = "Título sección About", Type = "text", Group = "About",
                     Value = "Un Refugio en la Naturaleza" },
                 new SiteSetting { Key = "AboutText", Label = "Texto descriptivo", Type = "textarea", Group = "About",
