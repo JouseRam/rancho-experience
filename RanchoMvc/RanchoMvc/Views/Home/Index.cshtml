@@ -260,10 +260,23 @@
                         <i class="bi bi-envelope-fill"></i>
                         <span>@Model.Setting("ContactEmail", "info@ranchoelpato.com")</span>
                     </a>
-                    <div class="contact-list-item">
-                        <i class="bi bi-geo-alt-fill"></i>
-                        <span>@Model.Setting("ContactAddress", "Camino al Rancho, México")</span>
-                    </div>
+                    @{
+                        var mapUrl = Model.Setting("ContactMapUrl");
+                    }
+                    @if (!string.IsNullOrEmpty(mapUrl))
+                    {
+                        <a href="@mapUrl" target="_blank" rel="noopener" class="contact-list-item">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <span>@Model.Setting("ContactAddress", "Camino al Rancho, México")</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="contact-list-item">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <span>@Model.Setting("ContactAddress", "Camino al Rancho, México")</span>
+                        </div>
+                    }
                     <div class="contact-list-item">
                         <i class="bi bi-clock-fill"></i>
                         <span>@Model.Setting("BusinessHours", "Abierto todos los días · 9:00 AM – 6:00 PM")</span>
@@ -279,15 +292,15 @@
                     <div class="social-links mt-4">
                         @if (!string.IsNullOrEmpty(wa))
                         {
-                            <a href="https://wa.me/@wa" class="social-btn whatsapp" target="_blank"><i class="bi bi-whatsapp"></i></a>
+                            <a href="https://wa.me/@(wa.Replace("+","").Replace(" ","").Replace("-",""))" class="social-btn whatsapp" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i></a>
                         }
                         @if (!string.IsNullOrEmpty(ig))
                         {
-                            <a href="@ig" class="social-btn instagram" target="_blank"><i class="bi bi-instagram"></i></a>
+                            <a href="@(ig.StartsWith("http") ? ig : "https://instagram.com/" + ig.TrimStart('@'))" class="social-btn instagram" target="_blank" rel="noopener"><i class="bi bi-instagram"></i></a>
                         }
                         @if (!string.IsNullOrEmpty(fb))
                         {
-                            <a href="@fb" class="social-btn facebook" target="_blank"><i class="bi bi-facebook"></i></a>
+                            <a href="@(fb.StartsWith("http") ? fb : "https://facebook.com/" + fb.TrimStart('@'))" class="social-btn facebook" target="_blank" rel="noopener"><i class="bi bi-facebook"></i></a>
                         }
                     </div>
                 }

@@ -360,28 +360,28 @@ h1,h2,h3,h4,h5 { font-family: 'Playfair Display', Georgia, serif; }
     min-width: 130px;
     text-align: center;
     padding: 14px 12px;
-    border: 2px solid rgba(255,255,255,.22);
+    border: 2px solid #d1d5db;
     border-radius: 14px;
-    color: rgba(255,255,255,.85);
-    background: rgba(255,255,255,.07);
+    color: #1a1a1a;
+    background: #f9fafb;
     transition: border-color .2s, background .2s, color .2s, transform .15s;
     user-select: none;
 }
 .pay-card:hover {
-    border-color: rgba(196,136,42,.6);
-    background: rgba(196,136,42,.1);
-    color: white;
+    border-color: #C4882A;
+    background: #fef9f2;
+    color: #1a1a1a;
     transform: translateY(-1px);
 }
 .btn-check:checked + .pay-card {
     border-color: #C4882A;
-    background: rgba(196,136,42,.22);
-    color: #C4882A;
-    box-shadow: 0 0 0 3px rgba(196,136,42,.25);
+    background: #fff4e0;
+    color: #92600a;
+    box-shadow: 0 0 0 3px rgba(196,136,42,.2);
 }
 .pay-card .pay-icon { font-size: 1.6rem; line-height: 1; }
 .pay-card .pay-label { font-weight: 600; font-size: .92rem; }
-.pay-card .pay-sub { font-size: .75rem; opacity: .75; }
+.pay-card .pay-sub { font-size: .75rem; opacity: .7; }
 
 /* ============================================================
    RESPONSIVE
