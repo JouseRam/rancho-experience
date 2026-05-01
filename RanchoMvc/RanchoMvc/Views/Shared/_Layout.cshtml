@@ -82,33 +82,133 @@
     @RenderBody()
 
     <!-- Footer -->
-    <footer class="footer-ranch py-5">
+    @{
+        var _fss    = ViewBag.SiteSettings as System.Collections.Generic.Dictionary<string, string>;
+        if (_fss == null) { _fss = new System.Collections.Generic.Dictionary<string, string>(); }
+        Func<string, string, string> _fs = (k, d) => {
+            string _v; return (_fss.TryGetValue(k, out _v) && !string.IsNullOrEmpty(_v)) ? _v : d;
+        };
+        var _fBizName = _fs("BusinessName", "Rancho El Pato");
+        var _fPhone   = _fs("ContactPhone",  "");
+        var _fEmail   = _fs("ContactEmail",  "");
+        var _fAddr    = _fs("ContactAddress","");
+        var _fWa      = _fs("SocialWhatsapp","");
+        var _fIg      = _fs("SocialInstagram","");
+        var _fFb      = _fs("SocialFacebook","");
+        var _fPlans   = ViewBag.FooterPlans as IList<RanchoMvc.Models.Plan>;
+    }
+    <footer style="background:#1a2e0a;color:rgba(255,255,255,.9);padding:3rem 0 1.5rem">
         <div class="container">
             <div class="row g-4">
+                <!-- Columna 1: Marca -->
                 <div class="col-md-4">
-                    <h5 class="footer-brand mb-3"><i class="fa-solid fa-leaf me-2"></i>Rancho Experience</h5>
-                    <p class="text-muted small">Experiencias únicas para toda la familia en contacto con la naturaleza. Creamos recuerdos que duran toda la vida.</p>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        @if (!string.IsNullOrEmpty((string)ViewBag.LogoUrl))
+                        {
+                            <img src="@ViewBag.LogoUrl" alt="@_fBizName" style="height:36px;width:auto;object-fit:contain" />
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-leaf" style="color:#C4882A;font-size:1.3rem"></i>
+                        }
+                        <span style="font-family:'@_fontTitle',serif;font-weight:700;font-size:1.1rem;color:white">@_fBizName</span>
+                    </div>
+                    <p style="color:rgba(255,255,255,.65);font-size:.875rem;line-height:1.6">
+                        Experiencias únicas para toda la familia en contacto con la naturaleza. Creamos recuerdos que duran toda la vida.
+                    </p>
+                    @if (!string.IsNullOrEmpty(_fWa) || !string.IsNullOrEmpty(_fIg) || !string.IsNullOrEmpty(_fFb))
+                    {
+                        <div class="d-flex gap-2 mt-3">
+                            @if (!string.IsNullOrEmpty(_fWa))
+                            {
+                                <a href="https://wa.me/@(_fWa.Replace("+","").Replace(" ","").Replace("-",""))"
+                                   target="_blank" rel="noopener"
+                                   style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;transition:.2s"
+                                   onmouseover="this.style.background='rgba(255,255,255,.22)'" onmouseout="this.style.background='rgba(255,255,255,.12)'">
+                                    <i class="bi bi-whatsapp"></i>
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(_fIg))
+                            {
+                                <a href="@(_fIg.StartsWith("http") ? _fIg : "https://instagram.com/" + _fIg.TrimStart('@'))"
+                                   target="_blank" rel="noopener"
+                                   style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;transition:.2s"
+                                   onmouseover="this.style.background='rgba(255,255,255,.22)'" onmouseout="this.style.background='rgba(255,255,255,.12)'">
+                                    <i class="bi bi-instagram"></i>
+                                </a>
+                            }
+                            @if (!string.IsNullOrEmpty(_fFb))
+                            {
+                                <a href="@(_fFb.StartsWith("http") ? _fFb : "https://facebook.com/" + _fFb.TrimStart('@'))"
+                                   target="_blank" rel="noopener"
+                                   style="width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:white;text-decoration:none;transition:.2s"
+                                   onmouseover="this.style.background='rgba(255,255,255,.22)'" onmouseout="this.style.background='rgba(255,255,255,.12)'">
+                                    <i class="bi bi-facebook"></i>
+                                </a>
+                            }
+                        </div>
+                    }
                 </div>
+
+                <!-- Columna 2: Planes activos -->
                 <div class="col-md-4">
-                    <h6 class="footer-heading mb-3">Planes</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#experiencias" class="footer-link">Paseo a Caballo</a></li>
-                        <li><a href="#experiencias" class="footer-link">Noches de Fogata</a></li>
-                        <li><a href="#experiencias" class="footer-link">Descanso Total</a></li>
+                    <h6 style="color:white;font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem">Nuestros Planes</h6>
+                    <ul class="list-unstyled mb-0">
+                        @if (_fPlans != null && _fPlans.Count > 0)
+                        {
+                            foreach (var _fp in _fPlans)
+                            {
+                                <li class="mb-2">
+                                    <a href="#experiencias" style="color:rgba(255,255,255,.75);text-decoration:none;font-size:.875rem;display:flex;align-items:center;gap:.5rem;transition:.2s"
+                                       onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,.75)'">
+                                        <i class="@_fp.Icon" style="font-size:.8rem;opacity:.7;width:16px;text-align:center"></i>
+                                        @_fp.Title
+                                    </a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li><a href="#experiencias" style="color:rgba(255,255,255,.75);text-decoration:none;font-size:.875rem">Ver experiencias</a></li>
+                        }
                     </ul>
                 </div>
+
+                <!-- Columna 3: Contacto -->
                 <div class="col-md-4">
-                    <h6 class="footer-heading mb-3">Contacto</h6>
-                    <p class="text-muted small">
-                        <i class="bi bi-envelope me-2"></i>contacto@ranchoexperience.com<br />
-                        <i class="bi bi-whatsapp me-2"></i>+52 (55) 0000-0000<br />
-                        <i class="bi bi-geo-alt me-2"></i>México
-                    </p>
+                    <h6 style="color:white;font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem">Contacto</h6>
+                    <ul class="list-unstyled mb-0">
+                        @if (!string.IsNullOrEmpty(_fEmail))
+                        {
+                            <li class="mb-2">
+                                <a href="mailto:@_fEmail" style="color:rgba(255,255,255,.75);text-decoration:none;font-size:.875rem;display:flex;align-items:center;gap:.6rem">
+                                    <i class="bi bi-envelope" style="opacity:.7;width:16px;text-align:center"></i>@_fEmail
+                                </a>
+                            </li>
+                        }
+                        @if (!string.IsNullOrEmpty(_fPhone))
+                        {
+                            <li class="mb-2">
+                                <a href="tel:@_fPhone" style="color:rgba(255,255,255,.75);text-decoration:none;font-size:.875rem;display:flex;align-items:center;gap:.6rem">
+                                    <i class="bi bi-telephone" style="opacity:.7;width:16px;text-align:center"></i>@_fPhone
+                                </a>
+                            </li>
+                        }
+                        @if (!string.IsNullOrEmpty(_fAddr))
+                        {
+                            <li class="mb-2">
+                                <span style="color:rgba(255,255,255,.75);font-size:.875rem;display:flex;align-items:flex-start;gap:.6rem">
+                                    <i class="bi bi-geo-alt mt-1" style="opacity:.7;width:16px;text-align:center;flex-shrink:0"></i>@_fAddr
+                                </span>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
-            <hr class="border-secondary mt-4" />
-            <div class="text-center text-muted small">
-                <p class="mb-0">&copy; @DateTime.Now.Year Rancho Experience. Todos los derechos reservados.</p>
+
+            <div style="height:1px;background:rgba(255,255,255,.1);margin:2rem 0 1.25rem"></div>
+            <div class="text-center" style="color:rgba(255,255,255,.45);font-size:.78rem">
+                &copy; @DateTime.Now.Year @_fBizName. Todos los derechos reservados.
             </div>
         </div>
     </footer>

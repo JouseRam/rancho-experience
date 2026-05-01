@@ -5,241 +5,663 @@
     var uploadUrl = Url.Action("UploadFile", "Settings", new { area = "Admin" });
     var fontTitleOptions = new[] { "Playfair Display", "Merriweather", "Lora", "Cormorant Garamond", "Georgia" };
     var fontBodyOptions  = new[] { "Inter", "Open Sans", "Roboto", "Lato", "Nunito" };
+
+    // Helpers para extraer valores de settings
+    Func<string, string> val = key => {
+        var s = Model.FirstOrDefault(x => x.Key == key);
+        return s != null ? (s.Value ?? "") : "";
+    };
+
+    var previewGroups = new HashSet<string> { "Hero", "About", "CTA", "Apariencia" };
+    var groupIcons = new Dictionary<string, string> {
+        {"General",         "bi-gear"}, {"Apariencia", "bi-palette"}, {"Pagos", "bi-bank"},
+        {"Hero",            "bi-play-circle"}, {"About", "bi-book"}, {"CTA",  "bi-megaphone"},
+        {"Caracteristicas", "bi-grid-1x2"}, {"Formulario", "bi-ui-checks"}, {"Contacto", "bi-telephone"}, {"Redes", "bi-share"}
+    };
 }
 
-<div class="mb-4">
-    <h5 class="mb-1 fw-semibold">Ajustes del Sitio</h5>
-    <p class="text-muted small mb-0">Personaliza colores, fuentes, textos e imágenes del sitio público.</p>
-</div>
+<style>
+    .settings-layout { display: flex; gap: 0; min-height: calc(100vh - 120px); }
+    .settings-sidebar {
+        width: 200px; flex-shrink: 0;
+        background: white; border-radius: 14px;
+        border: 1px solid rgba(0,0,0,.06);
+        box-shadow: var(--card-shadow);
+        padding: .5rem 0; height: fit-content;
+        position: sticky; top: 72px;
+    }
+    .settings-sidebar .tab-btn {
+        display: flex; align-items: center; gap: .6rem;
+        width: 100%; padding: .6rem 1rem;
+        background: none; border: none; cursor: pointer;
+        font-size: .825rem; color: #4b5563;
+        border-left: 3px solid transparent;
+        text-align: left; transition: .15s;
+        border-radius: 0;
+    }
+    .settings-sidebar .tab-btn:hover { background: #f9fafb; color: #111827; }
+    .settings-sidebar .tab-btn.active {
+        background: #f0f7ec; color: #2D5016; font-weight: 600;
+        border-left-color: #2D5016;
+    }
+    .settings-sidebar .tab-btn i { font-size: .85rem; opacity: .75; }
+    .settings-sidebar .tab-sep { height: 1px; background: #f3f4f6; margin: .4rem 0; }
 
-<form method="post" action="@Url.Action("Save","Settings",new{area="Admin"})">
-    @Html.AntiForgeryToken()
-
-    <div class="d-flex justify-content-end mb-3">
-        <button type="submit" class="btn px-4" style="background:#2D5016;color:white;">
-            <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios
-        </button>
-    </div>
-
-    @foreach (var group in groups)
-    {
-        <div class="stat-card mb-4">
-            <h6 class="fw-semibold mb-3 pb-2 border-bottom">
-                @if (group == "General")    { <text><i class="fa-solid fa-gear me-2"></i>General</text> }
-                else if (group == "Apariencia") { <text><i class="fa-solid fa-palette me-2"></i>Apariencia — Colores y Fuentes</text> }
-                else if (group == "Pagos")      { <text><i class="fa-solid fa-building-columns me-2"></i>Datos Bancarios (para pagos en ventanilla)</text> }
-                else if (group == "Hero")   { <text><i class="fa-solid fa-film me-2"></i>Hero (Portada)</text> }
-                else if (group == "About")  { <text><i class="fa-solid fa-book me-2"></i>Nosotros / Historia</text> }
-                else if (group == "CTA")    { <text><i class="fa-solid fa-bullhorn me-2"></i>Sección CTA</text> }
-                else if (group == "Contacto") { <text><i class="fa-solid fa-phone me-2"></i>Información de Contacto</text> }
-                else if (group == "Redes")  { <text><i class="fa-solid fa-share-nodes me-2"></i>Redes Sociales</text> }
-                else { @group }
-            </h6>
-
-            @if (group == "Apariencia")
-            {
-                <div class="row g-3">
-                    @foreach (var s in Model.Where(x => x.Group == "Apariencia"))
-                    {
-                        <div class="col-12 col-md-4">
-                            <label class="form-label fw-medium small">@s.Label</label>
-                            @if (s.Type == "color")
-                            {
-                                var hex = string.IsNullOrEmpty(s.Value) ? "#000000" : s.Value;
-                                <div class="d-flex align-items-center gap-2">
-                                    <input type="color" class="color-picker"
-                                           data-target="txt_@s.Id"
-                                           value="@hex"
-                                           style="width:44px;height:38px;padding:2px;border:1px solid #ced4da;border-radius:6px;cursor:pointer;" />
-                                    <input type="text" id="txt_@s.Id" name="setting_@s.Id"
-                                           class="form-control form-control-sm font-monospace"
-                                           value="@hex" maxlength="7"
-                                           style="width:100px;" />
-                                    <span class="color-swatch rounded"
-                                          id="swatch_@s.Id"
-                                          style="width:32px;height:32px;background:@hex;border:1px solid #ced4da;display:inline-block;"></span>
-                                </div>
-                            }
-                            else if (s.Type == "font-select")
-                            {
-                                var opts = s.Key == "FontTitle" ? fontTitleOptions : fontBodyOptions;
-                                <select name="setting_@s.Id" class="form-select font-preview-select" data-key="@s.Key">
-                                    @foreach (var opt in opts)
-                                    {
-                                        if (opt == s.Value)
-                                        {
-                                            <option value="@opt" selected="selected" style="font-family:'@opt'">@opt</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@opt" style="font-family:'@opt'">@opt</option>
-                                        }
-                                    }
-                                </select>
-                                <small class="text-muted mt-1 d-block font-preview" id="preview_font_@s.Id"
-                                       style="font-family:'@s.Value', serif; font-size:1rem;">
-                                    El rancho te espera — The quick brown fox
-                                </small>
-                            }
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="row g-3">
-                    @foreach (var s in Model.Where(x => x.Group == group))
-                    {
-                        <div class="col-12 @(s.Type == "text" || s.Type == "url" ? "col-md-6" : "")">
-                            <label class="form-label fw-medium small">@s.Label</label>
-                            @if (s.Type == "textarea")
-                            {
-                                <textarea name="setting_@s.Id" class="form-control" rows="3">@s.Value</textarea>
-                            }
-                            else if (s.Type == "video-url" || s.Type == "image-url")
-                            {
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="fa-solid @(s.Type == "video-url" ? "fa-film" : "fa-image")"></i>
-                                    </span>
-                                    <input type="url" id="url_@s.Id" name="setting_@s.Id" class="form-control"
-                                           value="@s.Value" placeholder="https://..." />
-                                    <label class="btn btn-outline-secondary mb-0 upload-btn" title="Subir archivo"
-                                           data-target="url_@s.Id"
-                                           data-preview="preview_@s.Id"
-                                           data-type="@s.Type">
-                                        <i class="fa-solid fa-upload"></i>
-                                        <input type="file" class="d-none"
-                                               accept="@(s.Type == "video-url" ? "video/*" : "image/*")" />
-                                    </label>
-                                </div>
-                                <div id="preview_@s.Id" class="mt-2">
-                                    @if (!string.IsNullOrEmpty(s.Value))
-                                    {
-                                        if (s.Type == "image-url")
-                                        {
-                                            <img src="@s.Value" alt="Preview" class="rounded"
-                                                 style="max-height:100px;max-width:100%;object-fit:cover;" />
-                                        }
-                                        else
-                                        {
-                                            <p class="text-muted small mb-0">
-                                                <i class="fa-solid fa-film me-1"></i>
-                                                <a href="@s.Value" target="_blank">@s.Value</a>
-                                            </p>
-                                        }
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <input type="text" name="setting_@s.Id" class="form-control" value="@s.Value" />
-                            }
-                        </div>
-                    }
-                </div>
-            }
-        </div>
+    .settings-main { flex: 1; min-width: 0; display: flex; gap: 1rem; }
+    .settings-form  { flex: 1; min-width: 0; }
+    .settings-preview {
+        width: 380px; flex-shrink: 0;
+        position: sticky; top: 72px; height: fit-content;
     }
 
-    <div class="text-end">
-        <button type="submit" class="btn btn-lg px-5" style="background:#2D5016;color:white;">
-            <i class="fa-solid fa-floppy-disk me-2"></i>Guardar Todos los Cambios
-        </button>
+    .settings-panel { display: none; }
+    .settings-panel.active { display: block; }
+
+    /* Preview panel */
+    .preview-box {
+        background: white; border-radius: 14px;
+        border: 1px solid rgba(0,0,0,.06);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+    .preview-header {
+        padding: .6rem 1rem; background: #f9fafb;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex; align-items: center; gap: .5rem;
+        font-size: .75rem; color: #6b7280; font-weight: 500;
+    }
+    .preview-header::before {
+        content: ''; display: flex; gap: 4px;
+    }
+    .preview-dots { display: flex; gap: 4px; }
+    .preview-dots span {
+        width: 8px; height: 8px; border-radius: 50%;
+    }
+
+    /* Hero preview */
+    #prev-hero {
+        min-height: 200px; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; text-align: center;
+        padding: 2rem 1.25rem; position: relative; overflow: hidden;
+        background-size: cover; background-position: center;
+    }
+    #prev-hero::after {
+        content: ''; position: absolute; inset: 0;
+        background: rgba(0,0,0,.48);
+    }
+    #prev-hero-title, #prev-hero-subtitle, #prev-hero-cta {
+        position: relative; z-index: 1;
+    }
+    #prev-hero-title { color: white; font-size: 1.15rem; font-weight: 700; margin: 0 0 .4rem; line-height: 1.25; }
+    #prev-hero-subtitle { color: rgba(255,255,255,.82); font-size: .78rem; margin: 0 0 .9rem; line-height: 1.5; }
+    #prev-hero-cta {
+        background: #C4882A; color: white; border: none;
+        padding: .4rem 1rem; border-radius: 6px; font-size: .78rem;
+        font-weight: 600; cursor: default;
+    }
+
+    /* About preview */
+    #prev-about { padding: 1.25rem; }
+    .prev-about-inner { display: flex; gap: 1rem; align-items: flex-start; }
+    #prev-about-img { width: 100px; height: 80px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: #e5e7eb; }
+    #prev-about-tag  { font-size: .65rem; color: #C4882A; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin: 0 0 .25rem; }
+    #prev-about-title { font-size: .95rem; font-weight: 700; color: #111827; margin: 0 0 .35rem; line-height: 1.25; }
+    #prev-about-text  { font-size: .72rem; color: #4b5563; margin: 0; line-height: 1.5; }
+
+    /* CTA preview */
+    #prev-cta {
+        min-height: 120px; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; text-align: center;
+        padding: 1.5rem 1.25rem; position: relative; overflow: hidden;
+        background-size: cover; background-position: center;
+    }
+    #prev-cta::after { content: ''; position: absolute; inset: 0; background: rgba(30,56,16,.7); }
+    #prev-cta-title, #prev-cta-subtitle {
+        position: relative; z-index: 1;
+    }
+    #prev-cta-title    { color: white; font-size: 1rem; font-weight: 700; margin: 0 0 .3rem; }
+    #prev-cta-subtitle { color: rgba(255,255,255,.78); font-size: .72rem; margin: 0; line-height: 1.5; }
+
+    /* Apariencia preview */
+    #prev-apariencia { padding: 1.25rem; }
+    .prev-color-row { display: flex; gap: .5rem; margin-bottom: .75rem; }
+    .prev-color-swatch {
+        width: 36px; height: 36px; border-radius: 8px;
+        border: 1px solid rgba(0,0,0,.1); flex-shrink: 0;
+    }
+    #prev-font-title-sample { font-size: 1.1rem; font-weight: 700; color: #111827; margin: 0 0 .25rem; }
+    #prev-font-body-sample  { font-size: .8rem; color: #6b7280; margin: 0; line-height: 1.5; }
+
+    @@media (max-width: 1280px) {
+        .settings-preview { display: none; }
+    }
+    @@media (max-width: 768px) {
+        .settings-layout { flex-direction: column; }
+        .settings-sidebar { width: 100%; position: static; display: flex; flex-wrap: wrap; padding: .25rem; }
+        .settings-sidebar .tab-btn { width: auto; padding: .4rem .75rem; border-radius: 8px; border: 1px solid #e5e7eb; border-left: 1px solid #e5e7eb; margin: .2rem; font-size: .78rem; }
+        .settings-sidebar .tab-btn.active { border-color: #2D5016; border-left-color: #2D5016; }
+        .settings-sidebar .tab-sep { display: none; }
+    }
+</style>
+
+<!-- Save button (sticky) -->
+<form id="settingsForm" method="post" action="@Url.Action("Save","Settings",new{area="Admin"})">
+@Html.AntiForgeryToken()
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h5 class="mb-0 fw-semibold">Ajustes del Sitio</h5>
+        <p class="text-muted mb-0" style="font-size:.8rem">Edita el contenido y apariencia del sitio público.</p>
     </div>
+    <button type="submit" class="btn px-4 fw-medium" style="background:#2D5016;color:white;">
+        <i class="bi bi-floppy me-2"></i>Guardar cambios
+    </button>
+</div>
+
+<div class="settings-layout">
+    <!-- Tab sidebar -->
+    <nav class="settings-sidebar me-3">
+        @{ int _gi = 0; }
+        @foreach (var group in groups)
+        {
+            if (_gi > 0 && _gi % 3 == 0)
+            {
+                <div class="tab-sep"></div>
+            }
+            var icon2 = groupIcons.ContainsKey(group) ? groupIcons[group] : "bi-circle";
+            <button type="button" class="tab-btn @(_gi==0?"active":"")"
+                    data-tab="tab-@group.ToLower().Replace(" ", "-")">
+                <i class="bi @icon2"></i> @group
+            </button>
+            _gi++;
+        }
+    </nav>
+
+    <!-- Form + preview -->
+    <div class="settings-main">
+        <div class="settings-form">
+            @{ int _pi = 0; }
+            @foreach (var group in groups)
+            {
+                <div class="settings-panel @(_pi==0?"active":"")" id="tab-@group.ToLower().Replace(" ","-")">
+                    <div class="stat-card">
+                        <h6 class="fw-semibold mb-4 d-flex align-items-center gap-2 pb-2 border-bottom">
+                            @{ var gi2 = groupIcons.ContainsKey(group) ? groupIcons[group] : "bi-circle"; }
+                            <i class="bi @gi2 text-muted"></i>
+                            @if (group == "General")    { <text>General</text> }
+                            else if (group == "Apariencia") { <text>Apariencia — Colores y Fuentes</text> }
+                            else if (group == "Pagos")  { <text>Datos Bancarios</text> }
+                            else if (group == "Hero")   { <text>Hero (Portada del sitio)</text> }
+                            else if (group == "About")  { <text>Nosotros / Historia</text> }
+                            else if (group == "CTA")           { <text>Sección CTA</text> }
+                            else if (group == "Caracteristicas") { <text>Características (grid Nosotros)</text> }
+                            else if (group == "Formulario")     { <text>Textos del Formulario CTA</text> }
+                            else if (group == "Contacto") { <text>Información de Contacto</text> }
+                            else if (group == "Redes")  { <text>Redes Sociales</text> }
+                            else { @group }
+                        </h6>
+
+                        @if (group == "Caracteristicas")
+                        {
+                            var feats = new[] {
+                                new { Num = 1, IconKey = "Feature1Icon", TitleKey = "Feature1Title", DescKey = "Feature1Desc" },
+                                new { Num = 2, IconKey = "Feature2Icon", TitleKey = "Feature2Title", DescKey = "Feature2Desc" },
+                                new { Num = 3, IconKey = "Feature3Icon", TitleKey = "Feature3Title", DescKey = "Feature3Desc" },
+                                new { Num = 4, IconKey = "Feature4Icon", TitleKey = "Feature4Title", DescKey = "Feature4Desc" },
+                            };
+                            <p class="text-muted small mb-3">
+                                Estas 4 características aparecen en el grid de la sección <strong>Nosotros</strong>.
+                                Para el ícono usa la clase de Font Awesome, ej: <code>fa-solid fa-horse</code>.
+                            </p>
+                            <div class="row g-3">
+                            @foreach (var f in feats)
+                            {
+                                var sIcon  = Model.FirstOrDefault(x => x.Key == f.IconKey);
+                                var sTitle = Model.FirstOrDefault(x => x.Key == f.TitleKey);
+                                var sDesc  = Model.FirstOrDefault(x => x.Key == f.DescKey);
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3 border" style="background:#fafafa">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <span class="rounded-circle d-flex align-items-center justify-content-center"
+                                                  style="width:32px;height:32px;background:#e8f4e8;flex-shrink:0">
+                                                <i class="@(sIcon != null ? sIcon.Value : "fa-solid fa-star")" style="color:#2D5016;font-size:.85rem"></i>
+                                            </span>
+                                            <span class="fw-semibold small">Característica @f.Num</span>
+                                        </div>
+                                        @if (sIcon != null)
+                                        {
+                                            <div class="mb-2">
+                                                <label class="form-label fw-medium" style="font-size:.72rem">Ícono (clase FA)</label>
+                                                <input type="text" name="setting_@sIcon.Id"
+                                                       class="form-control form-control-sm font-monospace"
+                                                       value="@sIcon.Value" placeholder="fa-solid fa-horse" />
+                                            </div>
+                                        }
+                                        @if (sTitle != null)
+                                        {
+                                            <div class="mb-2">
+                                                <label class="form-label fw-medium" style="font-size:.72rem">Título</label>
+                                                <input type="text" name="setting_@sTitle.Id"
+                                                       class="form-control form-control-sm live-setting"
+                                                       data-key="@f.TitleKey"
+                                                       value="@sTitle.Value" />
+                                            </div>
+                                        }
+                                        @if (sDesc != null)
+                                        {
+                                            <div>
+                                                <label class="form-label fw-medium" style="font-size:.72rem">Descripción</label>
+                                                <input type="text" name="setting_@sDesc.Id"
+                                                       class="form-control form-control-sm"
+                                                       value="@sDesc.Value" />
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            </div>
+                        }
+                        else if (group == "Apariencia")
+                        {
+                            <div class="row g-4">
+                                @foreach (var s in Model.Where(x => x.Group == "Apariencia"))
+                                {
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label fw-medium small">@s.Label</label>
+                                        @if (s.Type == "color")
+                                        {
+                                            var hex = string.IsNullOrEmpty(s.Value) ? "#000000" : s.Value;
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="color" class="color-picker"
+                                                       data-target="txt_@s.Id"
+                                                       data-swatch="swatch_@s.Id"
+                                                       data-key="@s.Key"
+                                                       value="@hex"
+                                                       style="width:44px;height:38px;padding:2px;border:1px solid #ced4da;border-radius:6px;cursor:pointer;" />
+                                                <input type="text" id="txt_@s.Id" name="setting_@s.Id"
+                                                       class="form-control form-control-sm font-monospace color-text"
+                                                       data-picker="@s.Id"
+                                                       data-key="@s.Key"
+                                                       value="@hex" maxlength="7"
+                                                       style="width:100px;" />
+                                                <span id="swatch_@s.Id" class="rounded"
+                                                      style="width:32px;height:32px;background:@hex;border:1px solid #ced4da;display:inline-block;flex-shrink:0"></span>
+                                            </div>
+                                        }
+                                        else if (s.Type == "font-select")
+                                        {
+                                            var opts = s.Key == "FontTitle" ? fontTitleOptions : fontBodyOptions;
+                                            <select name="setting_@s.Id"
+                                                    class="form-select font-preview-select"
+                                                    data-key="@s.Key"
+                                                    data-preview-id="preview_font_@s.Id">
+                                                @foreach (var opt in opts)
+                                                {
+                                                    <option value="@opt" @(opt == s.Value ? "selected" : "")
+                                                            style="font-family:'@opt'">@opt</option>
+                                                }
+                                            </select>
+                                            <small class="text-muted mt-1 d-block"
+                                                   id="preview_font_@s.Id"
+                                                   style="font-family:'@s.Value', serif; font-size:1rem;">
+                                                El rancho te espera — The quick brown fox
+                                            </small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row g-3">
+                                @foreach (var s in Model.Where(x => x.Group == group))
+                                {
+                                    <div class="col-12 @(s.Type == "text" || s.Type == "url" ? "col-md-6" : "")">
+                                        <label class="form-label fw-medium small">@s.Label</label>
+                                        @if (s.Type == "textarea")
+                                        {
+                                            <textarea name="setting_@s.Id"
+                                                      class="form-control live-setting"
+                                                      data-key="@s.Key"
+                                                      rows="3">@s.Value</textarea>
+                                        }
+                                        else if (s.Type == "video-url" || s.Type == "image-url")
+                                        {
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="bi @(s.Type == "video-url" ? "bi-play-circle" : "bi-image")"></i>
+                                                </span>
+                                                <input type="url" id="url_@s.Id" name="setting_@s.Id"
+                                                       class="form-control live-setting"
+                                                       data-key="@s.Key"
+                                                       value="@s.Value" placeholder="https://..." />
+                                                <label class="btn btn-outline-secondary mb-0 upload-btn"
+                                                       data-target="url_@s.Id"
+                                                       data-preview="preview_@s.Id"
+                                                       data-type="@s.Type">
+                                                    <i class="bi bi-upload upload-icon"></i>
+                                                    <input type="file" class="d-none"
+                                                           accept="@(s.Type == "video-url" ? "video/*" : "image/*")" />
+                                                </label>
+                                            </div>
+                                            <div id="preview_@s.Id" class="mt-2">
+                                                @if (!string.IsNullOrEmpty(s.Value))
+                                                {
+                                                    if (s.Type == "image-url")
+                                                    {
+                                                        <img src="@s.Value" alt="Preview" class="rounded"
+                                                             style="max-height:80px;max-width:100%;object-fit:cover;" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <p class="text-muted small mb-0">
+                                                            <i class="bi bi-play-circle me-1"></i>
+                                                            <a href="@s.Value" target="_blank">Video configurado</a>
+                                                        </p>
+                                                    }
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <input type="text" name="setting_@s.Id"
+                                                   class="form-control live-setting"
+                                                   data-key="@s.Key"
+                                                   value="@s.Value" />
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+                _pi++;
+            }
+        </div>
+
+        <!-- Live Preview Panel -->
+        <div class="settings-preview">
+            <!-- Hero preview -->
+            <div id="preview-pane-hero" class="preview-pane" style="display:none">
+                <div class="preview-box">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span style="background:#ef4444"></span>
+                            <span style="background:#f59e0b"></span>
+                            <span style="background:#22c55e"></span>
+                        </div>
+                        <span style="margin-left:.5rem">Vista previa — Hero</span>
+                    </div>
+                    <div id="prev-hero" style="background-image:url('@val("HeroImageUrl")')">
+                        <h2 id="prev-hero-title">@val("HeroTitle")</h2>
+                        <p id="prev-hero-subtitle">@val("HeroSubtitle")</p>
+                        <button id="prev-hero-cta">@val("HeroCtaText")</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About preview -->
+            <div id="preview-pane-about" class="preview-pane" style="display:none">
+                <div class="preview-box">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span style="background:#ef4444"></span>
+                            <span style="background:#f59e0b"></span>
+                            <span style="background:#22c55e"></span>
+                        </div>
+                        <span style="margin-left:.5rem">Vista previa — Nosotros</span>
+                    </div>
+                    <div id="prev-about">
+                        <div class="prev-about-inner">
+                            <img id="prev-about-img" src="@val("AboutImageUrl")" alt="About" />
+                            <div>
+                                <p id="prev-about-tag">@val("AboutTag")</p>
+                                <h3 id="prev-about-title">@val("AboutTitle")</h3>
+                                <p id="prev-about-text">@val("AboutText").Split('\n').FirstOrDefault()</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA preview -->
+            <div id="preview-pane-cta" class="preview-pane" style="display:none">
+                <div class="preview-box">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span style="background:#ef4444"></span>
+                            <span style="background:#f59e0b"></span>
+                            <span style="background:#22c55e"></span>
+                        </div>
+                        <span style="margin-left:.5rem">Vista previa — CTA</span>
+                    </div>
+                    <div id="prev-cta" style="background-image:url('@val("CtaBackgroundUrl")')">
+                        <h3 id="prev-cta-title">@val("CtaTitle")</h3>
+                        <p id="prev-cta-subtitle">@val("CtaSubtitle")</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apariencia preview -->
+            <div id="preview-pane-apariencia" class="preview-pane" style="display:none">
+                <div class="preview-box">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span style="background:#ef4444"></span>
+                            <span style="background:#f59e0b"></span>
+                            <span style="background:#22c55e"></span>
+                        </div>
+                        <span style="margin-left:.5rem">Vista previa — Apariencia</span>
+                    </div>
+                    <div id="prev-apariencia">
+                        <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em">Colores</p>
+                        <div class="prev-color-row">
+                            <div>
+                                <div id="prev-color-primary" class="prev-color-swatch" style="background:@val("ColorPrimary")"></div>
+                                <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;text-align:center">Principal</div>
+                            </div>
+                            <div>
+                                <div id="prev-color-secondary" class="prev-color-swatch" style="background:@val("ColorSecondary")"></div>
+                                <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;text-align:center">Acento</div>
+                            </div>
+                            <div>
+                                <div id="prev-color-accent" class="prev-color-swatch" style="background:@val("ColorAccent")"></div>
+                                <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;text-align:center">Detalles</div>
+                            </div>
+                        </div>
+                        <div style="height:1px;background:#f3f4f6;margin:.75rem 0"></div>
+                        <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em">Tipografía</p>
+                        <p id="prev-font-title-sample" style="font-family:'@val("FontTitle")', serif">
+                            Vive la naturaleza — Título
+                        </p>
+                        <p id="prev-font-body-sample" style="font-family:'@val("FontBody")', sans-serif">
+                            Experiencias únicas que conectan tu espíritu con la tierra. Cada momento es una aventura.
+                        </p>
+                        <div style="height:1px;background:#f3f4f6;margin:.75rem 0"></div>
+                        <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em">Botón de ejemplo</p>
+                        <button style="background:@val("ColorPrimary");color:white;border:none;
+                                       padding:.4rem 1rem;border-radius:6px;font-size:.8rem;cursor:default"
+                                id="prev-btn-sample">Reservar Ahora</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder for groups without preview -->
+            <div id="preview-pane-none" class="preview-pane" style="display:none">
+                <div class="preview-box">
+                    <div style="padding:1.5rem;text-align:center;color:#9ca3af">
+                        <i class="bi bi-eye-slash" style="font-size:2rem;display:block;margin-bottom:.5rem;opacity:.4"></i>
+                        <p style="font-size:.8rem;margin:0">Sin vista previa para esta sección</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-end mt-3">
+    <button type="submit" class="btn btn-lg px-5 fw-medium" style="background:#2D5016;color:white;">
+        <i class="bi bi-floppy me-2"></i>Guardar Todos los Cambios
+    </button>
+</div>
 </form>
 
 @section Scripts {
 <script>
-    var uploadUrl = '@uploadUrl';
+var uploadUrl = '@uploadUrl';
 
-    // Color picker — sincroniza picker ↔ texto ↔ swatch
-    document.addEventListener('input', function (e) {
-        if (e.target.classList.contains('color-picker')) {
-            var hex = e.target.value;
-            var txtId = e.target.dataset.target;
-            var txt = document.getElementById(txtId);
-            if (txt) txt.value = hex;
-            var swatchId = txtId.replace('txt_', 'swatch_');
-            var sw = document.getElementById(swatchId);
-            if (sw) sw.style.background = hex;
+// ── Tab navigation ──────────────────────────────────────────
+var previewPanes = {
+    'tab-hero':       'preview-pane-hero',
+    'tab-about':      'preview-pane-about',
+    'tab-cta':        'preview-pane-cta',
+    'tab-apariencia': 'preview-pane-apariencia'
+};
+
+function switchTab(btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    var tabId = btn.dataset.tab;
+    var panel = document.getElementById(tabId);
+    if (panel) panel.classList.add('active');
+
+    // Switch preview pane
+    document.querySelectorAll('.preview-pane').forEach(p => p.style.display = 'none');
+    var paneId = previewPanes[tabId] || 'preview-pane-none';
+    var pane = document.getElementById(paneId);
+    if (pane) pane.style.display = 'block';
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() { switchTab(this); });
+});
+// Show initial preview
+(function() {
+    var first = document.querySelector('.tab-btn.active');
+    if (first) switchTab(first);
+})();
+
+// ── Live setting update ──────────────────────────────────────
+var previewTargets = {
+    'HeroTitle':         function(v) { setText('prev-hero-title', v); },
+    'HeroSubtitle':      function(v) { setText('prev-hero-subtitle', v); },
+    'HeroCtaText':       function(v) { setText('prev-hero-cta', v); },
+    'HeroImageUrl':      function(v) { document.getElementById('prev-hero').style.backgroundImage = v ? 'url('+v+')' : 'none'; },
+    'AboutTag':          function(v) { setText('prev-about-tag', v); },
+    'AboutTitle':        function(v) { setText('prev-about-title', v); },
+    'AboutText':         function(v) { setText('prev-about-text', v.split('\n')[0]); },
+    'AboutImageUrl':     function(v) { var i = document.getElementById('prev-about-img'); if(i && v) i.src = v; },
+    'CtaTitle':          function(v) { setText('prev-cta-title', v); },
+    'CtaSubtitle':       function(v) { setText('prev-cta-subtitle', v); },
+    'CtaBackgroundUrl':  function(v) { document.getElementById('prev-cta').style.backgroundImage = v ? 'url('+v+')' : 'none'; },
+    'ColorPrimary':      function(v) { setBg('prev-color-primary', v); setStyle('prev-btn-sample', 'background', v); },
+    'ColorSecondary':    function(v) { setBg('prev-color-secondary', v); },
+    'ColorAccent':       function(v) { setBg('prev-color-accent', v); },
+    'FontTitle':         function(v) { loadGFont(v); setFont('prev-font-title-sample', v); },
+    'FontBody':          function(v) { loadGFont(v); setFont('prev-font-body-sample', v); },
+};
+
+function setText(id, v) { var el=document.getElementById(id); if(el) el.textContent = v; }
+function setBg(id, v)   { var el=document.getElementById(id); if(el) el.style.background = v; }
+function setStyle(id, prop, v) { var el=document.getElementById(id); if(el) el.style[prop] = v; }
+function setFont(id, v) { var el=document.getElementById(id); if(el) el.style.fontFamily = "'"+v+"', serif"; }
+function loadGFont(f) {
+    var lid = 'gf_'+f.replace(/ /g,'_');
+    if (!document.getElementById(lid)) {
+        var l = document.createElement('link');
+        l.id = lid; l.rel = 'stylesheet';
+        l.href = 'https://fonts.googleapis.com/css2?family='+f.replace(/ /g,'+')+'&display=swap';
+        document.head.appendChild(l);
+    }
+}
+
+document.addEventListener('input', function(e) {
+    var key = e.target.dataset && e.target.dataset.key;
+    if (key && previewTargets[key]) previewTargets[key](e.target.value);
+});
+document.addEventListener('change', function(e) {
+    var key = e.target.dataset && e.target.dataset.key;
+    if (key && previewTargets[key]) previewTargets[key](e.target.value);
+});
+
+// ── Color pickers ────────────────────────────────────────────
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('color-picker')) {
+        var hex = e.target.value;
+        var txtEl = document.getElementById(e.target.dataset.target);
+        if (txtEl) { txtEl.value = hex; txtEl.dispatchEvent(new Event('input', {bubbles:true})); }
+        var sw = document.getElementById(e.target.dataset.swatch);
+        if (sw) sw.style.background = hex;
+    }
+    if (e.target.classList.contains('color-text')) {
+        var v = e.target.value;
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+            var picker = document.querySelector('.color-picker[data-target="'+e.target.id+'"]');
+            if (picker) picker.value = v;
+            var sw2 = document.getElementById('swatch_'+e.target.dataset.picker);
+            if (sw2) sw2.style.background = v;
         }
-        if (e.target.id && e.target.id.indexOf('txt_') === 0) {
-            var val = e.target.value;
-            if (/^#[0-9a-fA-F]{6}$/.test(val)) {
-                var picker = document.querySelector('[data-target="' + e.target.id + '"]');
-                if (picker) picker.value = val;
-                var swatchId2 = e.target.id.replace('txt_', 'swatch_');
-                var sw2 = document.getElementById(swatchId2);
-                if (sw2) sw2.style.background = val;
-            }
-        }
-    });
+    }
+});
 
-    // Font select — actualiza preview en tiempo real y carga Google Font
-    document.addEventListener('change', function (e) {
-        if (e.target.classList.contains('font-preview-select')) {
-            var font = e.target.value;
-            var key  = e.target.dataset.key;
-            var previewId = 'preview_font_' + e.target.name.replace('setting_', '');
-            var preview = document.getElementById(previewId);
-            if (preview) preview.style.fontFamily = "'" + font + "', serif";
+// ── Font preview ─────────────────────────────────────────────
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('font-preview-select')) {
+        var font = e.target.value;
+        var previewId = e.target.dataset.previewId;
+        var previewEl = document.getElementById(previewId);
+        if (previewEl) previewEl.style.fontFamily = "'"+font+"', serif";
+        loadGFont(font);
+    }
+});
 
-            // Cargar fuente de Google Fonts si no está cargada
-            var linkId = 'gf_' + font.replace(/ /g, '_');
-            if (!document.getElementById(linkId)) {
-                var link = document.createElement('link');
-                link.id = linkId;
-                link.rel = 'stylesheet';
-                link.href = 'https://fonts.googleapis.com/css2?family=' + font.replace(/ /g, '+') + ':wght@400;600;700&display=swap';
-                document.head.appendChild(link);
-            }
-        }
+// ── File upload ───────────────────────────────────────────────
+document.addEventListener('change', function(e) {
+    if (e.target.type !== 'file') return;
+    var btn = e.target.closest('.upload-btn');
+    if (!btn || !e.target.files || !e.target.files[0]) return;
 
-        // Upload de archivos
-        var fileInput = e.target;
-        if (!fileInput || fileInput.type !== 'file') return;
-        var btn = fileInput.closest('.upload-btn');
-        if (!btn || !fileInput.files || !fileInput.files[0]) return;
+    var file    = e.target.files[0];
+    var urlInput = document.getElementById(btn.dataset.target);
+    var preview  = document.getElementById(btn.dataset.preview);
+    var type     = btn.dataset.type;
+    var icon     = btn.querySelector('.upload-icon');
 
-        var file     = fileInput.files[0];
-        var urlInput = document.getElementById(btn.dataset.target);
-        var preview  = document.getElementById(btn.dataset.preview);
-        var type     = btn.dataset.type;
-        var icon     = btn.querySelector('i');
+    icon.className = 'spinner-border spinner-border-sm upload-icon';
+    btn.classList.add('disabled');
 
-        icon.className = 'spinner-border spinner-border-sm';
-        btn.classList.add('disabled');
+    var fd = new FormData();
+    fd.append('file', file);
 
-        var fd = new FormData();
-        fd.append('file', file);
-
-        fetch(uploadUrl, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            if (data.success) {
-                urlInput.value = data.url;
-                if (type === 'image-url') {
-                    preview.innerHTML = '<img src="' + data.url + '" class="rounded" style="max-height:100px;max-width:100%;object-fit:cover;" />';
-                } else {
-                    preview.innerHTML = '<p class="text-muted small mb-0"><i class="fa-solid fa-film me-1"></i><a href="' + data.url + '" target="_blank">Video subido</a></p>';
-                }
+    fetch(uploadUrl, { method:'POST', body:fd, headers:{'X-Requested-With':'XMLHttpRequest'} })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            urlInput.value = data.url;
+            urlInput.dispatchEvent(new Event('input', {bubbles:true}));
+            if (type === 'image-url') {
+                preview.innerHTML = '<img src="'+data.url+'" class="rounded" style="max-height:80px;max-width:100%;object-fit:cover;" />';
             } else {
-                alert('Error: ' + data.message);
+                preview.innerHTML = '<p class="text-muted small mb-0"><i class="bi bi-play-circle me-1"></i><a href="'+data.url+'" target="_blank">Video subido</a></p>';
             }
-        })
-        .catch(function () { alert('Error de conexión.'); })
-        .finally(function () {
-            icon.className = 'fa-solid fa-upload';
-            btn.classList.remove('disabled');
-            fileInput.value = '';
-        });
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(() => alert('Error de conexión.'))
+    .finally(() => {
+        icon.className = 'bi bi-upload upload-icon';
+        btn.classList.remove('disabled');
+        e.target.value = '';
     });
+});
 
-    document.addEventListener('click', function (e) {
-        var btn = e.target.closest('.upload-btn');
-        if (!btn) return;
-        btn.querySelector('input[type=file]').click();
-    });
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.upload-btn');
+    if (!btn) return;
+    e.preventDefault();
+    btn.querySelector('input[type=file]').click();
+});
 </script>
 }

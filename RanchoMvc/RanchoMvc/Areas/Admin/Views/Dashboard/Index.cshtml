@@ -1,72 +1,109 @@
 @{
     ViewBag.Title = "Dashboard";
+    var reservations = ViewBag.RecentReservations as IList<RanchoMvc.Models.Reservation>;
+    var messages     = ViewBag.RecentMessages as IList<RanchoMvc.Models.ContactMessage>;
+    decimal revenue  = ViewBag.EstimatedRevenue != null ? (decimal)ViewBag.EstimatedRevenue : 0m;
 }
 
-<div class="row g-4 mb-4">
+<!-- KPI Row -->
+<div class="row g-3 mb-4">
     <div class="col-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon"><i class="fa-solid fa-list-check"></i></div>
-                <div>
-                    <div class="stat-value">@ViewBag.TotalPlans</div>
-                    <div class="stat-label">Planes Activos</div>
-                </div>
+        <div class="kpi-card">
+            <div class="kpi-icon green"><i class="bi bi-list-check"></i></div>
+            <div>
+                <div class="kpi-value">@ViewBag.TotalPlans</div>
+                <div class="kpi-label">Planes activos</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon"><i class="fa-solid fa-calendar-days"></i></div>
-                <div>
-                    <div class="stat-value">@ViewBag.PendingReservations</div>
-                    <div class="stat-label">Cotizaciones Pendientes</div>
-                </div>
+        <div class="kpi-card">
+            <div class="kpi-icon gold"><i class="bi bi-calendar-check"></i></div>
+            <div>
+                <div class="kpi-value">@ViewBag.PendingReservations</div>
+                <div class="kpi-label">Pendientes</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon"><i class="fa-solid fa-envelope"></i></div>
-                <div>
-                    <div class="stat-value">@ViewBag.UnreadMessages</div>
-                    <div class="stat-label">Mensajes Sin Leer</div>
-                </div>
+        <div class="kpi-card">
+            <div class="kpi-icon blue"><i class="bi bi-envelope"></i></div>
+            <div>
+                <div class="kpi-value">@ViewBag.UnreadMessages</div>
+                <div class="kpi-label">Mensajes sin leer</div>
             </div>
         </div>
     </div>
     <div class="col-6 col-xl-3">
-        <div class="stat-card">
-            <div class="d-flex align-items-center gap-3">
-                <div class="stat-icon"><i class="fa-solid fa-images"></i></div>
-                <div>
-                    <div class="stat-value">@ViewBag.TotalGallery</div>
-                    <div class="stat-label">Imágenes Galería</div>
-                </div>
+        <div class="kpi-card">
+            <div class="kpi-icon rose"><i class="bi bi-currency-dollar"></i></div>
+            <div>
+                <div class="kpi-value" style="font-size:1.4rem">$@revenue.ToString("N0")</div>
+                <div class="kpi-label">Ingresos confirmados</div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- Cotizaciones recientes -->
-    <div class="col-md-7">
+<!-- Charts Row -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="stat-card h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h6 class="mb-0 fw-semibold">Cotizaciones por mes</h6>
+                    <p class="text-muted mb-0" style="font-size:.75rem">Últimos 6 meses</p>
+                </div>
+            </div>
+            <div style="position:relative; height:220px">
+                <canvas id="chartByMonth"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="stat-card h-100">
+            <div class="mb-3">
+                <h6 class="mb-0 fw-semibold">Por estado</h6>
+                <p class="text-muted mb-0" style="font-size:.75rem">Distribución total</p>
+            </div>
+            <div style="position:relative; height:180px; display:flex; align-items:center; justify-content:center">
+                <canvas id="chartByStatus"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Second charts row + recent activity -->
+<div class="row g-3">
+    <!-- Plans chart -->
+    <div class="col-lg-5">
+        <div class="stat-card h-100">
+            <div class="mb-3">
+                <h6 class="mb-0 fw-semibold">Top planes solicitados</h6>
+                <p class="text-muted mb-0" style="font-size:.75rem">Por número de cotizaciones</p>
+            </div>
+            <div style="position:relative; height:180px">
+                <canvas id="chartByPlan"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent reservations -->
+    <div class="col-lg-7">
         <div class="stat-card">
             <div class="d-flex align-items-center justify-content-between mb-3">
-                <h6 class="mb-0 fw-semibold">Cotizaciones Recientes</h6>
-                <a href="@Url.Action("Index","Reservations",new{area="Admin"})" class="btn btn-sm btn-outline-secondary">Ver todas</a>
+                <h6 class="mb-0 fw-semibold">Cotizaciones recientes</h6>
+                <a href="@Url.Action("Index","Reservations",new{area="Admin"})"
+                   class="btn btn-sm btn-outline-secondary" style="font-size:.75rem">Ver todas</a>
             </div>
-            @{
-                var reservations = ViewBag.RecentReservations as IList<RanchoMvc.Models.Reservation>;
-            }
             @if (reservations != null && reservations.Count > 0)
             {
                 <div class="table-responsive">
-                    <table class="table table-sm table-hover">
-                        <thead class="table-light">
+                    <table class="table table-hover table-sm mb-0">
+                        <thead>
                             <tr>
                                 <th>Familia / Grupo</th>
+                                <th>Plan</th>
                                 <th>Fecha</th>
                                 <th>Estado</th>
                             </tr>
@@ -74,11 +111,12 @@
                         <tbody>
                             @foreach (var r in reservations)
                             {
-                                <tr>
-                                    <td>@r.CompanyName</td>
+                                <tr onclick="location.href='@Url.Action("Details","Reservations",new{area="Admin",id=r.Id})'" style="cursor:pointer">
+                                    <td class="fw-medium">@(string.IsNullOrEmpty(r.CompanyName) ? r.ContactName : r.CompanyName)</td>
+                                    <td class="text-muted small">@(r.Plan != null ? r.Plan.Title : "—")</td>
                                     <td class="text-muted small">@r.CreatedAt.ToString("dd/MM/yy")</td>
                                     <td>
-                                        <span class="badge @(r.Status=="Confirmada"?"badge-confirmed":r.Status=="Cancelada"?"badge-cancelled":"badge-pending")">
+                                        <span class="badge @(r.Status=="Confirmada"?"badge-confirmed":r.Status=="Cancelada"?"badge-cancelled":r.Status=="Pendiente de Pago"?"badge-pay":"badge-pending")">
                                             @r.Status
                                         </span>
                                     </td>
@@ -90,41 +128,130 @@
             }
             else
             {
-                <p class="text-muted small">No hay cotizaciones aún.</p>
+                <div class="empty-state py-4">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <p>No hay cotizaciones aún</p>
+                </div>
             }
         </div>
-    </div>
 
-    <!-- Mensajes recientes -->
-    <div class="col-md-5">
-        <div class="stat-card">
+        <!-- Recent messages -->
+        <div class="stat-card mt-3">
             <div class="d-flex align-items-center justify-content-between mb-3">
-                <h6 class="mb-0 fw-semibold">Mensajes Recientes</h6>
-                <a href="@Url.Action("Index","Messages",new{area="Admin"})" class="btn btn-sm btn-outline-secondary">Ver todos</a>
+                <h6 class="mb-0 fw-semibold">Mensajes recientes</h6>
+                <a href="@Url.Action("Index","Messages",new{area="Admin"})"
+                   class="btn btn-sm btn-outline-secondary" style="font-size:.75rem">Ver todos</a>
             </div>
-            @{
-                var messages = ViewBag.RecentMessages as IList<RanchoMvc.Models.ContactMessage>;
-            }
             @if (messages != null && messages.Count > 0)
             {
-                <ul class="list-unstyled">
+                <div class="d-flex flex-column gap-2">
                     @foreach (var m in messages)
                     {
-                        <li class="d-flex align-items-start gap-2 py-2 border-bottom">
-                            <i class="bi bi-person-circle fs-5 text-muted mt-1"></i>
-                            <div>
-                                <div class="fw-medium small">@m.Name @(!m.IsRead ? Html.Raw("<span class='badge bg-danger ms-1' style='font-size:.65rem'>Nuevo</span>") : null)</div>
-                                <div class="text-muted" style="font-size:.8rem">@m.Company</div>
-                                <div class="text-muted" style="font-size:.75rem">@m.CreatedAt.ToString("dd/MM/yy HH:mm")</div>
+                        <a href="@Url.Action("Details","Messages",new{area="Admin",id=m.Id})"
+                           class="d-flex align-items-center gap-2 text-decoration-none p-2 rounded-2"
+                           style="transition:.15s" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background=''">
+                            <div style="width:34px;height:34px;border-radius:50%;background:#e8f4e8;color:#2D5016;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0">
+                                @(m.Name.Length > 0 ? m.Name[0].ToString().ToUpper() : "?")
                             </div>
-                        </li>
+                            <div style="flex:1;min-width:0">
+                                <div class="d-flex align-items-center gap-1">
+                                    <span class="fw-medium text-dark small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@m.Name</span>
+                                    @if (!m.IsRead) { <span class="badge bg-danger" style="font-size:.55rem;padding:2px 5px">Nuevo</span> }
+                                </div>
+                                <div class="text-muted" style="font-size:.72rem">@m.CreatedAt.ToString("dd/MM/yy HH:mm")</div>
+                            </div>
+                        </a>
                     }
-                </ul>
+                </div>
             }
             else
             {
-                <p class="text-muted small">No hay mensajes aún.</p>
+                <div class="empty-state py-3">
+                    <p>No hay mensajes aún</p>
+                </div>
             }
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const green = '#2D5016', gold = '#C4882A', blue = '#2563eb', rose = '#db2777';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.font.size = 11;
+    Chart.defaults.color = '#9ca3af';
+
+    // --- Reservaciones por mes ---
+    new Chart(document.getElementById('chartByMonth'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(ViewBag.ChartMonthLabels ?? "[]"),
+            datasets: [{
+                label: 'Cotizaciones',
+                data: @Html.Raw(ViewBag.ChartMonthData ?? "[]"),
+                backgroundColor: 'rgba(45,80,22,.15)',
+                borderColor: green,
+                borderWidth: 2,
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // --- Por estado (donut) ---
+    new Chart(document.getElementById('chartByStatus'), {
+        type: 'doughnut',
+        data: {
+            labels: @Html.Raw(ViewBag.ChartStatusLabels ?? "[]"),
+            datasets: [{
+                data: @Html.Raw(ViewBag.ChartStatusData ?? "[]"),
+                backgroundColor: ['#fef3c7', '#d1fae5', '#fee2e2', '#ede9fe'],
+                borderColor: ['#fcd34d', '#6ee7b7', '#fca5a5', '#c4b5fd'],
+                borderWidth: 2, hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: { legend: { position: 'bottom', labels: { padding: 12, boxWidth: 10, font: { size: 11 } } } }
+        }
+    });
+
+    // --- Top planes (barra horizontal) ---
+    new Chart(document.getElementById('chartByPlan'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(ViewBag.ChartPlanLabels ?? "[]"),
+            datasets: [{
+                label: 'Cotizaciones',
+                data: @Html.Raw(ViewBag.ChartPlanData ?? "[]"),
+                backgroundColor: 'rgba(196,136,42,.2)',
+                borderColor: gold,
+                borderWidth: 2,
+                borderRadius: 5,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,.05)' } },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+}

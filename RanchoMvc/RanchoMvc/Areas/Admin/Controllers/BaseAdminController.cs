@@ -33,6 +33,9 @@ namespace RanchoMvc.Areas.Admin.Controllers
                 {
                     ViewBag.UserPerms = null;
                 }
+
+                ViewBag.PendingResCount = db.Reservations.Count(r => r.Status == "Pendiente");
+                ViewBag.UnreadMsgCount  = db.ContactMessages.Count(m => !m.IsRead);
             }
         }
     }

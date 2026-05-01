@@ -47,6 +47,9 @@ namespace RanchoMvc.Models
         [MaxLength(200)]
         public string MercadoPagoPreferenceId { get; set; }
 
+        [Display(Name = "Notas del administrador")]
+        public string AdminNotes { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

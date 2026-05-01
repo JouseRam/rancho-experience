@@ -171,6 +171,35 @@ namespace RanchoMvc.Data.Migrations
                 EnsureSetting(context, "BankHolder",      "Titular de la cuenta",     "text",         "Pagos");
                 EnsureSetting(context, "BankAccount",     "Número de cuenta",         "text",         "Pagos");
                 EnsureSetting(context, "BankCLABE",       "CLABE interbancaria",      "text",         "Pagos");
+
+                // 4 características editables (sección Nosotros)
+                EnsureSetting(context, "Feature1Icon",  "Característica 1 · Ícono (clase Font Awesome)", "text", "Caracteristicas", "fa-solid fa-horse");
+                EnsureSetting(context, "Feature1Title", "Característica 1 · Título",                     "text", "Caracteristicas", "Paseo a caballo");
+                EnsureSetting(context, "Feature1Desc",  "Característica 1 · Descripción",                "text", "Caracteristicas", "Explora paisajes increíbles con guías expertos");
+                EnsureSetting(context, "Feature2Icon",  "Característica 2 · Ícono",                      "text", "Caracteristicas", "fa-solid fa-house");
+                EnsureSetting(context, "Feature2Title", "Característica 2 · Título",                     "text", "Caracteristicas", "Hospedaje");
+                EnsureSetting(context, "Feature2Desc",  "Característica 2 · Descripción",                "text", "Caracteristicas", "Alojamiento rústico de lujo en plena naturaleza");
+                EnsureSetting(context, "Feature3Icon",  "Característica 3 · Ícono",                      "text", "Caracteristicas", "fa-solid fa-champagne-glasses");
+                EnsureSetting(context, "Feature3Title", "Característica 3 · Título",                     "text", "Caracteristicas", "Eventos");
+                EnsureSetting(context, "Feature3Desc",  "Característica 3 · Descripción",                "text", "Caracteristicas", "El escenario perfecto para celebraciones inolvidables");
+                EnsureSetting(context, "Feature4Icon",  "Característica 4 · Ícono",                      "text", "Caracteristicas", "fa-solid fa-tree");
+                EnsureSetting(context, "Feature4Title", "Característica 4 · Título",                     "text", "Caracteristicas", "Naturaleza");
+                EnsureSetting(context, "Feature4Desc",  "Característica 4 · Descripción",                "text", "Caracteristicas", "Conexión pura con el entorno natural");
+
+                // Mapa embebido (desde Google Maps > Compartir > Insertar mapa)
+                EnsureSetting(context, "ContactMapEmbed",  "Mapa — dirección, nombre del lugar, o URL de Google Maps", "text", "Contacto");
+                EnsureSetting(context, "HeroMapBtnText",   "Texto del botón 'Cómo llegar' en Hero (vacío = no mostrar)", "text", "Hero", "Cómo llegar");
+
+                // Textos del formulario de reserva
+                EnsureSetting(context, "FormLabelCompany", "Campo: Nombre de familia o grupo",  "text", "Formulario", "Nombre de familia o grupo (opcional)");
+                EnsureSetting(context, "FormLabelName",    "Campo: Nombre de contacto",          "text", "Formulario", "Tu nombre *");
+                EnsureSetting(context, "FormLabelEmail",   "Campo: Correo electrónico",          "text", "Formulario", "Correo electrónico *");
+                EnsureSetting(context, "FormLabelPhone",   "Campo: Teléfono",                    "text", "Formulario", "Teléfono *");
+                EnsureSetting(context, "FormLabelCars",    "Campo: Número de vehículos",         "text", "Formulario", "Núm. de autos *");
+                EnsureSetting(context, "FormLabelGuests",  "Campo: Número de personas",          "text", "Formulario", "Personas (opcional)");
+                EnsureSetting(context, "FormLabelNotes",   "Campo: Notas adicionales",           "text", "Formulario", "Notas adicionales...");
+                EnsureSetting(context, "FormBtnText",      "Texto del botón de reserva",         "text", "Formulario", "Reserva Tu Experiencia");
+
                 context.SaveChanges();
             }
         }

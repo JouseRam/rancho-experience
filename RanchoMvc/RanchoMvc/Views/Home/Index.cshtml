@@ -25,6 +25,17 @@
         <div class="d-flex gap-3 justify-content-center flex-wrap mt-4">
             <a href="#reservar" class="btn btn-gold btn-hero">@Model.Setting("HeroCtaText","Reserva Tu Experiencia")</a>
             <a href="#experiencias" class="btn btn-outline-light btn-hero">Ver Experiencias</a>
+            @{
+                var heroMapText = Model.Setting("HeroMapBtnText");
+                var heroMapUrl  = Model.Setting("ContactMapUrl");
+            }
+            @if (!string.IsNullOrEmpty(heroMapText) && !string.IsNullOrEmpty(heroMapUrl))
+            {
+                <a href="@heroMapUrl" target="_blank" rel="noopener"
+                   class="btn btn-outline-light btn-hero">
+                    <i class="bi bi-geo-alt-fill me-1"></i>@heroMapText
+                </a>
+            }
         </div>
     </div>
     <a href="#experiencias" class="hero-scroll-indicator">
@@ -114,11 +125,7 @@
                 {
                     <div class="about-img-wrap">
                         <img src="@Model.Setting("AboutImageUrl")" alt="Rancho El Pato" class="about-img" />
-                        <div class="about-badge">
-                            <i class="fa-solid fa-house about-badge-icon"></i>
-                            <span>Rancho Story</span>
                         </div>
-                    </div>
                 }
             </div>
             <div class="col-md-6">
@@ -133,23 +140,23 @@
                         }
                     }
                 </div>
+                @{
+                    var features = new[]
+                    {
+                        new { Icon = Model.Setting("Feature1Icon","fa-solid fa-horse"),            Title = Model.Setting("Feature1Title","Paseo a caballo"),  Desc = Model.Setting("Feature1Desc","Explora paisajes increíbles con guías expertos") },
+                        new { Icon = Model.Setting("Feature2Icon","fa-solid fa-house"),            Title = Model.Setting("Feature2Title","Hospedaje"),         Desc = Model.Setting("Feature2Desc","Alojamiento rústico de lujo en plena naturaleza") },
+                        new { Icon = Model.Setting("Feature3Icon","fa-solid fa-champagne-glasses"),Title = Model.Setting("Feature3Title","Eventos"),           Desc = Model.Setting("Feature3Desc","El escenario perfecto para celebraciones inolvidables") },
+                        new { Icon = Model.Setting("Feature4Icon","fa-solid fa-tree"),             Title = Model.Setting("Feature4Title","Naturaleza"),        Desc = Model.Setting("Feature4Desc","Conexión pura con el entorno natural") },
+                    };
+                }
                 <div class="features-grid mt-4">
-                    <div class="feature-item">
-                        <i class="fa-solid fa-horse feature-emoji"></i>
-                        <div><strong>Paseo a caballo</strong><p>Explora paisajes increíbles con guías expertos</p></div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fa-solid fa-house feature-emoji"></i>
-                        <div><strong>Hospedaje</strong><p>Alojamiento rústico de lujo en plena naturaleza</p></div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fa-solid fa-champagne-glasses feature-emoji"></i>
-                        <div><strong>Eventos</strong><p>El escenario perfecto para celebraciones inolvidables</p></div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fa-solid fa-tree feature-emoji"></i>
-                        <div><strong>Naturaleza</strong><p>Conexión pura con el entorno natural</p></div>
-                    </div>
+                    @foreach (var feat in features)
+                    {
+                        <div class="feature-item">
+                            <i class="@feat.Icon feature-emoji"></i>
+                            <div><strong>@feat.Title</strong><p>@feat.Desc</p></div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -165,6 +172,16 @@
         <p class="cta-subtitle">@Model.Setting("CtaSubtitle")</p>
         <div class="row justify-content-center mt-5">
             <div class="col-lg-8">
+                @{
+                    var lblCompany = Model.Setting("FormLabelCompany", "Nombre de familia o grupo (opcional)");
+                    var lblName    = Model.Setting("FormLabelName",    "Tu nombre *");
+                    var lblEmail   = Model.Setting("FormLabelEmail",   "Correo electrónico *");
+                    var lblPhone   = Model.Setting("FormLabelPhone",   "Teléfono *");
+                    var lblCars    = Model.Setting("FormLabelCars",    "Núm. de autos *");
+                    var lblGuests  = Model.Setting("FormLabelGuests",  "Personas (opcional)");
+                    var lblNotes   = Model.Setting("FormLabelNotes",   "Notas adicionales...");
+                    var formBtn    = Model.Setting("FormBtnText",      "Reserva Tu Experiencia");
+                }
                 <div class="reservation-form-card">
                     @using (Html.BeginForm("Quote", "Contact", FormMethod.Post, new { id = "quoteForm" }))
                     {
@@ -177,16 +194,16 @@
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                @Html.TextBoxFor(m => m.ReservationForm.CompanyName, new { @class = "form-control form-control-lg", placeholder = "Nombre de familia o grupo (opcional)" })
+                                @Html.TextBoxFor(m => m.ReservationForm.CompanyName, new { @class = "form-control form-control-lg", placeholder = lblCompany })
                             </div>
                             <div class="col-md-6">
-                                @Html.TextBoxFor(m => m.ReservationForm.ContactName, new { @class = "form-control form-control-lg", placeholder = "Tu nombre *" })
+                                @Html.TextBoxFor(m => m.ReservationForm.ContactName, new { @class = "form-control form-control-lg", placeholder = lblName })
                             </div>
                             <div class="col-md-6">
-                                @Html.TextBoxFor(m => m.ReservationForm.Email, new { @class = "form-control form-control-lg", type = "email", placeholder = "Correo electrónico *" })
+                                @Html.TextBoxFor(m => m.ReservationForm.Email, new { @class = "form-control form-control-lg", type = "email", placeholder = lblEmail })
                             </div>
                             <div class="col-md-6">
-                                @Html.TextBoxFor(m => m.ReservationForm.Phone, new { @class = "form-control form-control-lg", type = "tel", placeholder = "Teléfono *" })
+                                @Html.TextBoxFor(m => m.ReservationForm.Phone, new { @class = "form-control form-control-lg", type = "tel", placeholder = lblPhone })
                             </div>
                             <div class="col-md-6">
                                 @Html.DropDownListFor(m => m.ReservationForm.PlanId, Model.ReservationForm.Plans, "— Selecciona tu experiencia —", new { @class = "form-select form-select-lg" })
@@ -195,10 +212,16 @@
                                 @Html.TextBoxFor(m => m.ReservationForm.PreferredDate, "{0:yyyy-MM-dd}", new { @class = "form-control form-control-lg", type = "date" })
                             </div>
                             <div class="col-md-4">
-                                @Html.TextBoxFor(m => m.ReservationForm.NumberOfCars, new { @class = "form-control form-control-lg", type = "number", min = "1", max = "50", placeholder = "Núm. de autos *", id = "inputCars" })
+                                <input type="number" name="ReservationForm.NumberOfCars" id="inputCars"
+                                       class="form-control form-control-lg" min="1" max="50"
+                                       placeholder="@lblCars"
+                                       value="@(Model.ReservationForm.NumberOfCars > 0 ? Model.ReservationForm.NumberOfCars.ToString() : "")" />
                             </div>
                             <div class="col-md-4">
-                                @Html.TextBoxFor(m => m.ReservationForm.GuestCount, new { @class = "form-control form-control-lg", type = "number", min = "0", max = "500", placeholder = "Personas (opcional)" })
+                                <input type="number" name="ReservationForm.GuestCount"
+                                       class="form-control form-control-lg" min="0" max="500"
+                                       placeholder="@lblGuests"
+                                       value="@(Model.ReservationForm.GuestCount > 0 ? Model.ReservationForm.GuestCount.ToString() : "")" />
                             </div>
                             <div class="col-md-4" id="priceEstimate" style="display:none;">
                                 <div class="w-100 text-center rounded p-2" style="background:rgba(196,136,42,0.18);border:1px solid #C4882A;">
@@ -228,11 +251,11 @@
                                 </div>
                             </div>
                             <div class="col-12">
-                                @Html.TextAreaFor(m => m.ReservationForm.Notes, new { @class = "form-control", rows = "2", placeholder = "Notas adicionales..." })
+                                @Html.TextAreaFor(m => m.ReservationForm.Notes, new { @class = "form-control", rows = "2", placeholder = lblNotes })
                             </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-gold btn-lg w-100" id="quoteBtn">
-                                    <span class="btn-text">Reserva Tu Experiencia</span>
+                                    <span class="btn-text">@formBtn</span>
                                     <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-2"></span>Enviando...</span>
                                 </button>
                             </div>
@@ -263,19 +286,25 @@
                     @{
                         var mapUrl = Model.Setting("ContactMapUrl");
                     }
+                    <div class="contact-list-item" @(!string.IsNullOrEmpty(mapUrl) ? "" : "")>
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>@Model.Setting("ContactAddress", "Camino al Rancho, México")</span>
+                    </div>
                     @if (!string.IsNullOrEmpty(mapUrl))
                     {
-                        <a href="@mapUrl" target="_blank" rel="noopener" class="contact-list-item">
-                            <i class="bi bi-geo-alt-fill"></i>
-                            <span>@Model.Setting("ContactAddress", "Camino al Rancho, México")</span>
+                        <a href="@mapUrl" target="_blank" rel="noopener"
+                           class="map-open-card mt-2 d-flex align-items-center gap-3 p-3 rounded-3 text-decoration-none"
+                           style="background:#f0f7ec;border:1.5px solid #c6ddb8;transition:.2s"
+                           onmouseover="this.style.background='#e0f0d8'" onmouseout="this.style.background='#f0f7ec'">
+                            <div style="width:44px;height:44px;background:#2D5016;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                <i class="bi bi-map-fill" style="color:white;font-size:1.1rem"></i>
+                            </div>
+                            <div style="flex:1;min-width:0">
+                                <div style="color:#2D5016;font-weight:600;font-size:.875rem">Ver ubicación</div>
+                                <div style="color:#6b7280;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Abrir en Google Maps</div>
+                            </div>
+                            <i class="bi bi-arrow-up-right-square" style="color:#2D5016;font-size:1.05rem;flex-shrink:0"></i>
                         </a>
-                    }
-                    else
-                    {
-                        <div class="contact-list-item">
-                            <i class="bi bi-geo-alt-fill"></i>
-                            <span>@Model.Setting("ContactAddress", "Camino al Rancho, México")</span>
-                        </div>
                     }
                     <div class="contact-list-item">
                         <i class="bi bi-clock-fill"></i>
@@ -306,6 +335,61 @@
                 }
             </div>
             <div class="col-md-7">
+                @{
+                    var mapRaw = Model.Setting("ContactMapEmbed");
+                    if (string.IsNullOrEmpty(mapRaw))
+                    {
+                        mapRaw = Model.Setting("ContactMapUrl");
+                    }
+
+                    string embedSrc = null;
+                    if (!string.IsNullOrEmpty(mapRaw))
+                    {
+                        var mt = mapRaw.Trim();
+
+                        // If user pasted the full <iframe ...> tag, extract the src value
+                        if (mt.StartsWith("<iframe", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var srcStart = mt.IndexOf("src=\"", StringComparison.OrdinalIgnoreCase);
+                            if (srcStart >= 0)
+                            {
+                                srcStart += 5;
+                                var srcEnd = mt.IndexOf('"', srcStart);
+                                if (srcEnd > srcStart)
+                                {
+                                    mt = mt.Substring(srcStart, srcEnd - srcStart);
+                                }
+                            }
+                        }
+
+                        if (!mt.StartsWith("http"))
+                        {
+                            // Plain address/text — generate search embed
+                            embedSrc = "https://maps.google.com/maps?q=" + Uri.EscapeDataString(mt) + "&output=embed";
+                        }
+                        else if (mt.Contains("google.com/maps/embed") || mt.Contains("maps/embed"))
+                        {
+                            embedSrc = mt;
+                        }
+                        else if (mt.Contains("maps.google.com/maps") || mt.Contains("google.com/maps"))
+                        {
+                            embedSrc = mt.Contains("output=embed")
+                                ? mt
+                                : mt + (mt.Contains("?") ? "&" : "?") + "output=embed";
+                        }
+                    }
+                }
+                @if (!string.IsNullOrEmpty(embedSrc))
+                {
+                    <div class="mb-4 rounded-4 overflow-hidden" style="height:260px;box-shadow:0 2px 16px rgba(0,0,0,.12)">
+                        <iframe src="@embedSrc"
+                                width="100%" height="100%"
+                                style="border:0;display:block"
+                                allowfullscreen="" loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="Ubicación Rancho"></iframe>
+                    </div>
+                }
                 <div class="form-card p-4">
                     @using (Html.BeginForm("Send", "Contact", FormMethod.Post, new { id = "contactForm" }))
                     {

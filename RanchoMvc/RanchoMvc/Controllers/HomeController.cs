@@ -30,6 +30,7 @@ namespace RanchoMvc.Controllers
 
             var mpToken = ConfigurationManager.AppSettings["MercadoPagoAccessToken"] ?? "";
             ViewBag.OnlinePaymentEnabled = !string.IsNullOrEmpty(mpToken) && mpToken != "REEMPLAZAR";
+            ViewBag.FooterPlans = vm.Plans;
 
             return View(vm);
         }

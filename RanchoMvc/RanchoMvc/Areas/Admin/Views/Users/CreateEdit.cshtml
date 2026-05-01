@@ -19,11 +19,32 @@
     </p>
 </div>
 
-@using (Html.BeginForm(Model.IsNew ? "Create" : "Edit", "Users", new { area = "Admin" }, FormMethod.Post))
-{
+@{
+    var formAction = Model.IsNew
+        ? Url.Action("Create", "Users", new { area = "Admin" })
+        : Url.Action("Edit", "Users", new { area = "Admin" });
+}
+<form method="post" action="@formAction">
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.IsNew)
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        var allErrors = ViewData.ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).Where(m => !string.IsNullOrEmpty(m)).ToList();
+        if (allErrors.Any())
+        {
+            <div class="alert alert-danger d-flex align-items-start gap-2 mb-3">
+                <i class="bi bi-exclamation-circle-fill mt-1 flex-shrink-0"></i>
+                <div>
+                    @foreach (var err in allErrors)
+                    {
+                        <div>@err</div>
+                    }
+                </div>
+            </div>
+        }
+    }
 
     <div class="row g-4">
         <!-- Columna izquierda: datos del usuario -->
@@ -35,18 +56,26 @@
 
                 <div class="mb-3">
                     @Html.LabelFor(m => m.Email, new { @class = "form-label fw-medium small" })
-                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "correo@ejemplo.com", @readonly = !Model.IsNew ? "readonly" : null })
-                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
-                    @if (!Model.IsNew)
+                    @if (Model.IsNew)
                     {
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "correo@ejemplo.com" })
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @readonly = "readonly" })
                         <small class="text-muted">El correo no se puede cambiar.</small>
                     }
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
                 </div>
 
                 <div class="mb-3">
                     @Html.LabelFor(m => m.Password, new { @class = "form-label fw-medium small" })
                     @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = Model.IsNew ? "Mínimo 6 caracteres" : "Dejar vacío para no cambiar", autocomplete = "new-password" })
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                    @if (Model.IsNew)
+                    {
+                        <small class="text-muted">Mínimo 6 caracteres. Debe incluir letras y números.</small>
+                    }
                 </div>
 
                 <div class="mb-3">
@@ -174,7 +203,7 @@
             <i class="bi bi-floppy me-2"></i>@(Model.IsNew ? "Crear Usuario" : "Guardar Cambios")
         </button>
     </div>
-}
+</form>
 
 @section Scripts {
 <script>

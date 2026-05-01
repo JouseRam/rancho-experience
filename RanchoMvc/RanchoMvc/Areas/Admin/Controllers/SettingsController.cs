@@ -17,7 +17,7 @@ namespace RanchoMvc.Areas.Admin.Controllers
         private readonly RanchoDbContext _db = new RanchoDbContext();
 
         private static readonly List<string> GroupOrder = new List<string>
-            { "General", "Apariencia", "Pagos", "Hero", "About", "CTA", "Contacto", "Redes" };
+            { "General", "Apariencia", "Pagos", "Hero", "About", "Caracteristicas", "CTA", "Formulario", "Contacto", "Redes" };
 
         public ActionResult Index()
         {
@@ -31,6 +31,7 @@ namespace RanchoMvc.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public ActionResult Save(FormCollection form)
         {
             var settings = _db.SiteSettings.ToList();

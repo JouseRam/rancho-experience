@@ -23,12 +23,25 @@
                 @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger small" })
             </div>
             <div class="col-md-2">
-                <label class="form-label fw-medium">Ícono (emoji)</label>
-                @Html.TextBoxFor(m => m.Icon, new { @class = "form-control" })
-            </div>
-            <div class="col-md-2">
                 <label class="form-label fw-medium">Orden</label>
                 @Html.TextBoxFor(m => m.Order, new { @class = "form-control", type = "number" })
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-medium d-flex align-items-center gap-2">
+                    Preview
+                    <i id="iconPreview" class="@Model.Icon" style="font-size:1.1rem;color:#2D5016"></i>
+                </label>
+                <div class="form-control d-flex align-items-center justify-content-center" style="background:#f0f7ec;font-size:1.3rem;height:38px">
+                    <i id="iconPreviewLg" class="@Model.Icon" style="color:#2D5016"></i>
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-medium">Ícono Font Awesome</label>
+                @Html.TextBoxFor(m => m.Icon, new { @class = "form-control font-monospace", id = "iconInput" })
+                <small class="text-muted">
+                    Busca un ícono en <a href="https://fontawesome.com/icons" target="_blank">fontawesome.com/icons</a>
+                    y copia la clase, ej: <code>fa-solid fa-horse</code> · <code>fa-solid fa-fire</code> · <code>fa-solid fa-sun</code>
+                </small>
             </div>
             <div class="col-12">
                 <label class="form-label fw-medium">Descripción corta</label>
@@ -68,3 +81,20 @@
         </div>
     }
 </div>
+
+@section Scripts {
+<script>
+    var iconInput = document.getElementById('iconInput');
+    function updateIconPreview() {
+        var cls = (iconInput.value || '').trim();
+        ['iconPreview','iconPreviewLg'].forEach(function(id){
+            var el = document.getElementById(id);
+            el.className = cls || 'fa-solid fa-star';
+        });
+    }
+    if (iconInput) {
+        iconInput.addEventListener('input', updateIconPreview);
+        updateIconPreview();
+    }
+</script>
+}
