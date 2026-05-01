@@ -454,19 +454,33 @@
                         <span style="margin-left:.5rem">Vista previa — Apariencia</span>
                     </div>
                     <div id="prev-apariencia">
-                        <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em">Colores</p>
+                        <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em">Colores del sitio</p>
                         <div class="prev-color-row">
                             <div>
                                 <div id="prev-color-primary" class="prev-color-swatch" style="background:@val("ColorPrimary")"></div>
-                                <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;text-align:center">Principal</div>
+                                <div style="font-size:.6rem;color:#9ca3af;margin-top:.2rem;text-align:center">Principal</div>
                             </div>
                             <div>
-                                <div id="prev-color-secondary" class="prev-color-swatch" style="background:@val("ColorSecondary")"></div>
-                                <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;text-align:center">Acento</div>
+                                <div id="prev-color-secondary" class="prev-color-swatch" style="background:@(string.IsNullOrEmpty(val("ColorSecondary")) ? "#8B5E3C" : val("ColorSecondary"))"></div>
+                                <div style="font-size:.6rem;color:#9ca3af;margin-top:.2rem;text-align:center">Café / Acento</div>
                             </div>
                             <div>
                                 <div id="prev-color-accent" class="prev-color-swatch" style="background:@val("ColorAccent")"></div>
-                                <div style="font-size:.65rem;color:#9ca3af;margin-top:.2rem;text-align:center">Detalles</div>
+                                <div style="font-size:.6rem;color:#9ca3af;margin-top:.2rem;text-align:center">Café oscuro</div>
+                            </div>
+                        </div>
+                        <div class="prev-color-row mt-1">
+                            <div>
+                                <div id="prev-color-navbar" class="prev-color-swatch" style="background:@(string.IsNullOrEmpty(val("ColorNavbar")) ? "#111111" : val("ColorNavbar"))"></div>
+                                <div style="font-size:.6rem;color:#9ca3af;margin-top:.2rem;text-align:center">Navbar</div>
+                            </div>
+                            <div>
+                                <div id="prev-color-footer" class="prev-color-swatch" style="background:@(string.IsNullOrEmpty(val("ColorFooter")) ? "#1a2e0a" : val("ColorFooter"))"></div>
+                                <div style="font-size:.6rem;color:#9ca3af;margin-top:.2rem;text-align:center">Footer</div>
+                            </div>
+                            <div>
+                                <div id="prev-color-crema" class="prev-color-swatch" style="background:@(string.IsNullOrEmpty(val("ColorCrema")) ? "#f7f4ee" : val("ColorCrema"));border:1px solid #e5e7eb"></div>
+                                <div style="font-size:.6rem;color:#9ca3af;margin-top:.2rem;text-align:center">Secciones</div>
                             </div>
                         </div>
                         <div style="height:1px;background:#f3f4f6;margin:.75rem 0"></div>
@@ -478,10 +492,17 @@
                             Experiencias únicas que conectan tu espíritu con la tierra. Cada momento es una aventura.
                         </p>
                         <div style="height:1px;background:#f3f4f6;margin:.75rem 0"></div>
-                        <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em">Botón de ejemplo</p>
-                        <button style="background:@val("ColorPrimary");color:white;border:none;
-                                       padding:.4rem 1rem;border-radius:6px;font-size:.8rem;cursor:default"
-                                id="prev-btn-sample">Reservar Ahora</button>
+                        <p class="text-muted mb-2" style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em">Ejemplo visual</p>
+                        <div style="background:@(string.IsNullOrEmpty(val("ColorNavbar"))?"#111111":val("ColorNavbar"));padding:.4rem .75rem;border-radius:6px 6px 0 0;display:flex;align-items:center;gap:.5rem">
+                            <span style="width:8px;height:8px;border-radius:50%;background:@(string.IsNullOrEmpty(val("ColorSecondary"))?"#8B5E3C":val("ColorSecondary"))" id="prev-nav-dot"></span>
+                            <span style="color:white;font-size:.7rem;font-weight:600">Rancho El Pato</span>
+                            <span style="margin-left:auto;background:@(string.IsNullOrEmpty(val("ColorSecondary"))?"#8B5E3C":val("ColorSecondary"));color:white;font-size:.65rem;padding:.15rem .5rem;border-radius:4px" id="prev-nav-btn">Reservar</span>
+                        </div>
+                        <div style="background:@(string.IsNullOrEmpty(val("ColorCrema"))?"#f7f4ee":val("ColorCrema"));padding:.5rem .75rem" id="prev-body-section">
+                            <button style="background:@val("ColorPrimary");color:white;border:none;
+                                           padding:.35rem .9rem;border-radius:6px;font-size:.75rem;cursor:default"
+                                    id="prev-btn-sample">Reservar Ahora</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -556,8 +577,11 @@ var previewTargets = {
     'CtaSubtitle':       function(v) { setText('prev-cta-subtitle', v); },
     'CtaBackgroundUrl':  function(v) { document.getElementById('prev-cta').style.backgroundImage = v ? 'url('+v+')' : 'none'; },
     'ColorPrimary':      function(v) { setBg('prev-color-primary', v); setStyle('prev-btn-sample', 'background', v); },
-    'ColorSecondary':    function(v) { setBg('prev-color-secondary', v); },
+    'ColorSecondary':    function(v) { setBg('prev-color-secondary', v); setStyle('prev-nav-btn', 'background', v); setStyle('prev-nav-dot', 'background', v); },
     'ColorAccent':       function(v) { setBg('prev-color-accent', v); },
+    'ColorNavbar':       function(v) { setBg('prev-color-navbar', v); },
+    'ColorFooter':       function(v) { setBg('prev-color-footer', v); },
+    'ColorCrema':        function(v) { setBg('prev-color-crema', v); setStyle('prev-body-section', 'background', v); },
     'FontTitle':         function(v) { loadGFont(v); setFont('prev-font-title-sample', v); },
     'FontBody':          function(v) { loadGFont(v); setFont('prev-font-body-sample', v); },
 };

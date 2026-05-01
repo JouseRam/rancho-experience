@@ -162,11 +162,19 @@ namespace RanchoMvc.Data.Migrations
             {
                 // BD existente — agregar solo los settings que falten
                 EnsureSetting(context, "LogoUrl",         "Logo del Rancho",          "image-url",    "General");
-                EnsureSetting(context, "ColorPrimary",    "Color principal (verde)",  "color",        "Apariencia", "#2D5016");
-                EnsureSetting(context, "ColorSecondary",  "Color dorado / acentos",   "color",        "Apariencia", "#C4882A");
-                EnsureSetting(context, "ColorAccent",     "Color café / detalles",    "color",        "Apariencia", "#5C3A1E");
-                EnsureSetting(context, "FontTitle",       "Fuente de títulos",        "font-select",  "Apariencia", "Playfair Display");
-                EnsureSetting(context, "FontBody",        "Fuente de texto",          "font-select",  "Apariencia", "Inter");
+                EnsureSetting(context, "ColorPrimary",    "Color principal (verde)",       "color",        "Apariencia", "#2D5016");
+                EnsureSetting(context, "ColorSecondary",  "Color café / acentos",         "color",        "Apariencia", "#8B5E3C");
+                EnsureSetting(context, "ColorAccent",     "Color café oscuro / detalles", "color",        "Apariencia", "#5C3A1E");
+                EnsureSetting(context, "ColorNavbar",     "Color del navbar (al hacer scroll)", "color",  "Apariencia", "#111111");
+                EnsureSetting(context, "ColorFooter",     "Color de fondo del footer",    "color",        "Apariencia", "#1a2e0a");
+                EnsureSetting(context, "ColorCrema",      "Color de secciones claras",    "color",        "Apariencia", "#f7f4ee");
+                EnsureSetting(context, "FontTitle",       "Fuente de títulos",            "font-select",  "Apariencia", "Playfair Display");
+                EnsureSetting(context, "FontBody",        "Fuente de texto",              "font-select",  "Apariencia", "Inter");
+
+                // Update old label if DB was created with "dorado" label
+                var csRec = context.SiteSettings.FirstOrDefault(s => s.Key == "ColorSecondary");
+                if (csRec != null && csRec.Label == "Color dorado / acentos")
+                    csRec.Label = "Color café / acentos";
                 EnsureSetting(context, "BankName",        "Banco",                    "text",         "Pagos");
                 EnsureSetting(context, "BankHolder",      "Titular de la cuenta",     "text",         "Pagos");
                 EnsureSetting(context, "BankAccount",     "Número de cuenta",         "text",         "Pagos");

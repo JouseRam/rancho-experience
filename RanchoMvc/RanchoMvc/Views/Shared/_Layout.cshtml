@@ -19,13 +19,23 @@
     var _ss = ViewBag.SiteSettings as System.Collections.Generic.Dictionary<string, string>;
     if (_ss == null) { _ss = new System.Collections.Generic.Dictionary<string, string>(); }
     string _colorPrimary, _colorSecondary, _colorAccent, _fontTitle, _fontBody;
-    if (!_ss.TryGetValue("ColorPrimary", out _colorPrimary) || string.IsNullOrEmpty(_colorPrimary)) { _colorPrimary = "#2D5016"; }
-    if (!_ss.TryGetValue("ColorSecondary", out _colorSecondary) || string.IsNullOrEmpty(_colorSecondary)) { _colorSecondary = "#C4882A"; }
-    if (!_ss.TryGetValue("ColorAccent", out _colorAccent) || string.IsNullOrEmpty(_colorAccent)) { _colorAccent = "#5C3A1E"; }
-    if (!_ss.TryGetValue("FontTitle", out _fontTitle) || string.IsNullOrEmpty(_fontTitle)) { _fontTitle = "Playfair Display"; }
-    if (!_ss.TryGetValue("FontBody", out _fontBody) || string.IsNullOrEmpty(_fontBody)) { _fontBody = "Inter"; }
+    string _colorNavbar, _colorFooter, _colorCrema;
+    if (!_ss.TryGetValue("ColorPrimary",   out _colorPrimary)   || string.IsNullOrEmpty(_colorPrimary))   { _colorPrimary   = "#2D5016"; }
+    if (!_ss.TryGetValue("ColorSecondary", out _colorSecondary) || string.IsNullOrEmpty(_colorSecondary)) { _colorSecondary = "#8B5E3C"; }
+    if (!_ss.TryGetValue("ColorAccent",    out _colorAccent)    || string.IsNullOrEmpty(_colorAccent))    { _colorAccent    = "#5C3A1E"; }
+    if (!_ss.TryGetValue("ColorNavbar",    out _colorNavbar)    || string.IsNullOrEmpty(_colorNavbar))    { _colorNavbar    = "#111111"; }
+    if (!_ss.TryGetValue("ColorFooter",    out _colorFooter)    || string.IsNullOrEmpty(_colorFooter))    { _colorFooter    = "#1a2e0a"; }
+    if (!_ss.TryGetValue("ColorCrema",     out _colorCrema)     || string.IsNullOrEmpty(_colorCrema))     { _colorCrema     = "#f7f4ee"; }
+    if (!_ss.TryGetValue("FontTitle",      out _fontTitle)      || string.IsNullOrEmpty(_fontTitle))      { _fontTitle      = "Playfair Display"; }
+    if (!_ss.TryGetValue("FontBody",       out _fontBody)       || string.IsNullOrEmpty(_fontBody))       { _fontBody       = "Inter"; }
     var _gfTitle = _fontTitle.Replace(" ", "+");
     var _gfBody  = _fontBody.Replace(" ", "+");
+    // Compute RGB channels for secondary color (allows rgba(var(--color2-rgb), alpha) in CSS)
+    int _r2 = 139, _g2 = 94, _b2 = 60;
+    try {
+        var _h2 = _colorSecondary.TrimStart('#');
+        if (_h2.Length == 6) { _r2 = Convert.ToInt32(_h2.Substring(0,2),16); _g2 = Convert.ToInt32(_h2.Substring(2,2),16); _b2 = Convert.ToInt32(_h2.Substring(4,2),16); }
+    } catch { }
 }
     <!-- Google Fonts (dinámico según ajustes) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -34,11 +44,15 @@
     <!-- Variables de apariencia (desde Ajustes del Sitio) -->
     <style>
         :root {
-            --green:  @_colorPrimary;
-            --green2: @_colorPrimary;
-            --gold:   @_colorSecondary;
-            --gold2:  @_colorSecondary;
-            --brown:  @_colorAccent;
+            --green:      @_colorPrimary;
+            --green2:     @_colorPrimary;
+            --gold:       @_colorSecondary;
+            --gold2:      @_colorSecondary;
+            --brown:      @_colorAccent;
+            --color2-rgb: @_r2, @_g2, @_b2;
+            --navbar-bg:  @_colorNavbar;
+            --footer-bg:  @_colorFooter;
+            --cream:      @_colorCrema;
         }
         body { font-family: '@_fontBody', sans-serif; }
         h1,h2,h3,h4,h5 { font-family: '@_fontTitle', Georgia, serif; }
@@ -97,7 +111,7 @@
         var _fFb      = _fs("SocialFacebook","");
         var _fPlans   = ViewBag.FooterPlans as IList<RanchoMvc.Models.Plan>;
     }
-    <footer style="background:#1a2e0a;color:rgba(255,255,255,.9);padding:3rem 0 1.5rem">
+    <footer style="background:var(--footer-bg,#1a2e0a);color:rgba(255,255,255,.9);padding:3rem 0 1.5rem">
         <div class="container">
             <div class="row g-4">
                 <!-- Columna 1: Marca -->
