@@ -9,6 +9,12 @@
 
     var allSteps = new[] { "Pendiente", "Confirmada" };
     bool isCancelled = Model.Status == "Cancelada";
+
+    var _displayName = string.IsNullOrEmpty(Model.CompanyName) ? Model.ContactName : Model.CompanyName;
+    var _mailSubject = "mailto:" + Model.Email + "?subject=" + Uri.EscapeDataString("Cotización #" + Model.Id + " — " + _displayName);
+    var _waPhone    = (Model.Phone ?? "").Replace("+","").Replace(" ","").Replace("-","");
+    var _waText     = Uri.EscapeDataString("Hola " + Model.ContactName + ", te escribimos sobre tu cotización #" + Model.Id);
+    var _waUrl      = "https://wa.me/" + _waPhone + "?text=" + _waText;
 }
 
 <div class="mb-3">
@@ -194,13 +200,13 @@
         <div class="stat-card mb-3">
             <h6 class="fw-semibold mb-3">Acciones rápidas</h6>
             <div class="d-flex flex-column gap-2">
-                <a href="mailto:@Model.Email?subject=Cotización %23@Model.Id — @Uri.EscapeDataString(string.IsNullOrEmpty(Model.CompanyName) ? Model.ContactName : Model.CompanyName)"
+                <a href="@_mailSubject"
                    class="btn btn-sm btn-outline-secondary w-100 text-start">
                     <i class="bi bi-envelope me-2"></i>Responder por email
                 </a>
                 @if (!string.IsNullOrEmpty(Model.Phone))
                 {
-                    <a href="https://wa.me/@(Model.Phone.Replace("+","").Replace(" ","").Replace("-",""))?text=Hola%20@Uri.EscapeDataString(Model.ContactName),%20te%20escribimos%20sobre%20tu%20cotizaci%C3%B3n%20%23@Model.Id"
+                    <a href="@_waUrl"
                        target="_blank"
                        class="btn btn-sm btn-outline-secondary w-100 text-start">
                         <i class="bi bi-whatsapp me-2"></i>WhatsApp
