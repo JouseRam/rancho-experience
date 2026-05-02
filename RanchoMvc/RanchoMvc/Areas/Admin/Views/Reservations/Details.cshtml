@@ -53,7 +53,7 @@
                             </div>
                             <span style="font-size:.8rem;font-weight:@(current?"600":"400");color:@(current?"#111827":"#6b7280")">@step</span>
                         </div>
-                        @if (step != allSteps[allSteps.Length - 1])
+                        if (step != allSteps[allSteps.Length - 1])
                         {
                             <div style="flex:1;height:2px;background:@(done&&Model.Status=="Confirmada"?"#2D5016":"#e5e7eb");min-width:32px"></div>
                         }

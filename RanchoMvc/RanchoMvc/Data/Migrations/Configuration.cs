@@ -175,10 +175,12 @@ namespace RanchoMvc.Data.Migrations
                 var csRec = context.SiteSettings.FirstOrDefault(s => s.Key == "ColorSecondary");
                 if (csRec != null && csRec.Label == "Color dorado / acentos")
                     csRec.Label = "Color café / acentos";
-                EnsureSetting(context, "BankName",        "Banco",                    "text",         "Pagos");
-                EnsureSetting(context, "BankHolder",      "Titular de la cuenta",     "text",         "Pagos");
-                EnsureSetting(context, "BankAccount",     "Número de cuenta",         "text",         "Pagos");
-                EnsureSetting(context, "BankCLABE",       "CLABE interbancaria",      "text",         "Pagos");
+                EnsureSetting(context, "BankName",                 "Banco",                              "text", "Pagos");
+                EnsureSetting(context, "BankHolder",              "Titular de la cuenta",               "text", "Pagos");
+                EnsureSetting(context, "BankAccount",             "Número de cuenta",                   "text", "Pagos");
+                EnsureSetting(context, "BankCLABE",               "CLABE interbancaria",                "text", "Pagos");
+                EnsureSetting(context, "MercadoPagoAccessToken",  "MercadoPago — Access Token",         "text", "Pagos", "REEMPLAZAR");
+                EnsureSetting(context, "SiteBaseUrl",             "URL base del sitio (para pagos MP)", "text", "Pagos", "https://ranchoelpato.somee.com");
 
                 // 4 características editables (sección Nosotros)
                 EnsureSetting(context, "Feature1Icon",  "Característica 1 · Ícono (clase Font Awesome)", "text", "Caracteristicas", "fa-solid fa-horse");

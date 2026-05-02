@@ -1,4 +1,3 @@
-using System.Configuration;
 using System.Linq;
 using System.Web.Mvc;
 using RanchoMvc.Data;
@@ -28,7 +27,7 @@ namespace RanchoMvc.Controllers
                 ContactForm = new ContactViewModel()
             };
 
-            var mpToken = ConfigurationManager.AppSettings["MercadoPagoAccessToken"] ?? "";
+            var mpToken = _db.SiteSettings.FirstOrDefault(s => s.Key == "MercadoPagoAccessToken")?.Value ?? "";
             ViewBag.OnlinePaymentEnabled = !string.IsNullOrEmpty(mpToken) && mpToken != "REEMPLAZAR";
             ViewBag.FooterPlans = vm.Plans;
 
